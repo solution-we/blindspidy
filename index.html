@@ -131,8 +131,20 @@ form{display:grid;gap:14px}.f{position:relative}.f svg{position:absolute;left:18
  <div class="f"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><input id="ce" name="email" type="email" placeholder="Enter a valid email address" aria-label="Email" autocomplete="email"><div class="err" data-e="ce"></div></div>
  <div class="f"><svg class="ic" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-12 7l-5 1 1.5-4.5A8 8 0 1 1 21 12z"/></svg><textarea id="cm" name="message" placeholder="Enter your message" aria-label="Message"></textarea><div class="err" data-e="cm"></div></div>
  <input type="text" id="hp" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
- <label class="chk"><input type="checkbox" id="ct"> <span>I accept the <a href="#about" id="tos">Terms of Service</a></span></label><div class="err" data-e="ct"></div>
+ <label class="chk"><input type="checkbox" id="ct"> <span>I accept the <a href="#terms" id="tos">Terms of Service</a></span></label><div class="err" data-e="ct"></div>
  <button class="btn" type="submit">SUBMIT →</button><p class="note">Delivery backend not connected yet: submitting opens a pre-filled email to blindspidy2@gmail.com.</p></form></div></section>
+<section class="page" id="p-terms"><a class="mark desk-logo" href="#home">Blind <b>Spidy.</b></a><h1 class="it">Terms <s>//</s></h1><p class="sub">Terms of Service and Conditions. Last updated: 23 November 2026.</p><div class="bar"></div>
+<div class="lead" style="font-size:16px;color:var(--tx2);max-width:760px">
+<h3 style="color:#fff">1. Acceptance</h3><p>By using this website or sending a message through the contact form, you agree to these Terms of Service and Conditions. If you do not agree, please do not use the site.</p>
+<h3 style="color:#fff">2. What this site is</h3><p>Blind Spidy is a content space by Nijad. It lists games, tools, presets, patches and other resources shared in videos, along with links to YouTube and Instagram content. It is not a marketplace and does not host or sell games.</p>
+<h3 style="color:#fff">3. Third-party links and downloads</h3><p>Many resources point to external websites or files owned by others. We do not control them and are not responsible for their content, availability or safety. Scan downloads with security software and check the licence of anything you download. You are responsible for using software and games in line with their licences and the laws where you live.</p>
+<h3 style="color:#fff">4. Intellectual property</h3><p>Brand names, logos and game artwork belong to their respective owners. The Blind Spidy name, design and original content may not be copied or republished without permission. If you believe content here infringes your rights, email us and we will review it promptly.</p>
+<h3 style="color:#fff">5. Acceptable use</h3><p>Do not send spam, abuse, malware or unlawful content through the contact form, and do not attempt to disrupt or gain unauthorised access to the site.</p>
+<h3 style="color:#fff">6. Contact form and your data</h3><p>Name, email and message you submit are used only to reply to you. We do not sell your data. Messages may be kept for as long as needed to handle your request. Ask us to delete your message at any time.</p>
+<h3 style="color:#fff">7. No warranty and liability</h3><p>The site and its resources are provided as is, without warranties of any kind. To the extent permitted by law, Blind Spidy and Nijad are not liable for any loss or damage arising from use of the site or any linked resource.</p>
+<h3 style="color:#fff">8. Changes</h3><p>We may update these terms. Continued use of the site after changes means you accept them.</p>
+<h3 style="color:#fff">9. Contact</h3><p>Questions about these terms: <a href="mailto:blindspidy2@gmail.com" style="color:var(--red)">blindspidy2@gmail.com</a>.</p>
+<p class="note">Draft terms for general guidance. Have a qualified lawyer review them before relying on them.</p></div></section>
 </main><div id="toast" role="status"></div>
 <script>
 /* ===== CONFIG — replace with synced data when APIs/backend are connected ===== */
@@ -172,8 +184,8 @@ $('#stats').innerHTML=row('yt','YouTube','Subscribers','<div class="logo"><svg w
 requestAnimationFrame(()=>setTimeout(()=>$$('.fill').forEach(f=>f.style.width=f.dataset.w+'%'),50))}
 /* galleries */
 const SORTS={latest:['Latest First',(a,b)=>a.d-b.d],views:['Most Viewed',(a,b)=>b.v-a.v],az:['A–Z',(a,b)=>a.t.localeCompare(b.t)],za:['Z–A',(a,b)=>b.t.localeCompare(a.t)],old:['Oldest First',(a,b)=>b.d-a.d]};
-const th=(x,extra='')=>`<div class="th" style="background:linear-gradient(135deg,${COL[x.c].split(',')[0]},${COL[x.c].split(',')[1]})"><span aria-hidden="true">${x.g}</span>${extra}</div>`;
-const open=x=>x.url?window.open(x.url,'_blank','noopener'):toast('Link not configured yet. Add the URL in the admin panel.');
+const th=(x,extra='')=>`<div class="th" style="background:linear-gradient(135deg,${COL[x.c].split(',')[0]},${COL[x.c].split(',')[1]})">${x.th?`<img src="${esc(x.th)}" alt="" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">`:`<span aria-hidden="true">${x.g}</span>`}${extra}</div>`;
+const open=x=>(x.id&&sb.rpc('increment_resource_view',{rid:x.id}).then(()=>{}),x.url)?window.open(x.url,'_blank','noopener'):toast('Link not configured yet. Add the URL in the admin panel.');
 function gallery(id,data,opts={}){const sel=$('#s-'+id);if(!sel.options.length)sel.innerHTML=Object.entries(SORTS).map(([k,v])=>`<option value="${k}">${v[0]}</option>`).join('');
  const q=$('#q-'+id)?.value.trim().toLowerCase()||'';const list=data().filter(x=>x.t.toLowerCase().includes(q)).sort(SORTS[sel.value][1]);
  const g=$('#g-'+id);g.innerHTML=list.length?'':`<div class="empty">${opts.empty||'Nothing found.'}</div>`;
@@ -183,7 +195,7 @@ function gallery(id,data,opts={}){const sel=$('#s-'+id);if(!sel.options.length)s
 let plat='yt',tab='video';
 const vids=()=>plat=='yt'?VID.filter(v=>v.k==tab):REELS;
 const render={links:()=>gallery('links',()=>RES,{empty:'No resources match your search.'}),assets:()=>gallery('assets',()=>ASSETS,{empty:'No assets published yet. Add presets, overlays and graphics from the admin panel.'}),
- videos:()=>gallery('videos',vids,{yt:plat=='yt',empty:plat=='yt'?'No videos in this tab yet. Sync pending or add one manually in admin.':'No Reels yet. Instagram sync is pending.'}),home:stats,about:()=>{}};
+ videos:()=>gallery('videos',vids,{yt:plat=='yt',empty:plat=='yt'?'No videos in this tab yet. Sync pending or add one manually in admin.':'No Reels yet. Instagram sync is pending.'}),home:stats,about:()=>{},terms:()=>{}};
 ['links','assets','videos'].forEach(id=>{$('#s-'+id).onchange=render[id];$('#q-'+id)&&($('#q-'+id).oninput=render[id])});
 $$('#plat button').forEach(b=>b.onclick=()=>{plat=b.dataset.p;$$('#plat button').forEach(x=>x.classList.toggle('on',x==b));$('#tabs').style.display=plat=='yt'?'flex':'none';render.videos()});
 $$('#tabs button').forEach(b=>b.onclick=()=>{tab=b.dataset.t;$$('#tabs button').forEach(x=>x.classList.toggle('on',x==b));render.videos()});
@@ -194,10 +206,69 @@ function route(){const h=(location.hash.slice(1)||'home');const r=render[h]?h:'h
 addEventListener('hashchange',route);route();
 /* contact */
 const setE=(k,m)=>{$(`[data-e=${k}]`).textContent=m;const i=$('#'+k);i&&i.setAttribute('aria-invalid',!!m)};
-$('#tos').onclick=e=>{e.preventDefault();toast('Terms of Service page not published yet.')};
+$$('.cl a').forEach(a=>a.onclick=e=>{e.preventDefault();const v=decodeURIComponent(a.getAttribute('href').replace(/^(mailto:|tel:)/,''));try{navigator.clipboard.writeText(v)}catch(_){}toast('Copied '+v+' to your clipboard.');try{window.open(a.href,'_top')}catch(_){}});
 $('#cf').onsubmit=e=>{e.preventDefault();if($('#hp').value)return;const n=$('#cn').value.trim(),m=$('#ce').value.trim(),msg=$('#cm').value.trim();let ok=true;
  const chk=(k,bad,txt)=>{setE(k,bad?txt:'');if(bad)ok=false};
  chk('cn',n.length<2,'Enter your name.');chk('ce',!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(m),'Enter a valid email address.');chk('cm',msg.length<10,'Message must be at least 10 characters.');chk('ct',!$('#ct').checked,'Accept the Terms of Service to continue.');
  if(!ok)return;const body=encodeURIComponent(`Name: ${n}\nEmail: ${m}\n\n${msg}`);
  location.href=`mailto:blindspidy2@gmail.com?subject=${encodeURIComponent('Message from '+n+' via Blind Spidy')}&body=${body}`;toast('Opening your email app to send the message.')};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+const sb=supabase.createClient('https://mnwajosoystfikvhjdyf.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ud2Fqb3NveXN0ZmlrdmhqZHlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU0MTg4NjYsImV4cCI6MjExMDk5NDg2Nn0.eHwS2FfGka3-yR3cnczAHo5jPx0WO4t8YUDtjW2Uiyg');
+document.head.insertAdjacentHTML('beforeend','<style>.ai{background:rgba(0,0,0,.5);border:1px solid #666;border-radius:12px;padding:10px 12px;width:100%;min-height:44px}.ar{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bd);flex-wrap:wrap}.ar button{border:1px solid #555;background:none;border-radius:10px;padding:8px 12px;cursor:pointer;margin-left:6px}.ar small{color:var(--tx2)}#p-admin h3{margin:32px 0 12px}</style>');
+document.querySelector('main').insertAdjacentHTML('beforeend','<section class="page" id="p-admin"></section>');
+document.querySelector('.note').textContent='Your message goes straight to the Blind Spidy inbox.';
+const rel=iso=>Math.max(0,Math.floor((Date.now()-new Date(iso))/864e5)),H=s=>esc(String(s??''));
+async function sync(){try{
+ const [r,v,s]=await Promise.all([sb.from('resources').select('*').eq('visible',true),sb.from('videos').select('*').eq('visible',true),sb.from('social_stats').select('*')]);
+ if(r.error||v.error)throw (r.error||v.error);
+ const mr=x=>({id:x.id,t:x.title,g:x.title[0],c:'k',v:x.views,d:rel(x.created_at),cat:x.category,url:x.external_url||'',th:x.thumbnail_url});
+ RES.splice(0,RES.length,...r.data.filter(x=>x.section=='links').map(mr));
+ ASSETS.splice(0,ASSETS.length,...r.data.filter(x=>x.section=='assets').map(mr));
+ const mv=x=>({t:x.title,g:'▶',c:'k',v:Number(x.view_count),d:rel(x.published_at),dur:x.duration,k:x.kind,url:x.url,th:x.thumbnail_url});
+ VID.splice(0,VID.length,...v.data.filter(x=>x.platform=='youtube').map(mv));
+ REELS.splice(0,REELS.length,...v.data.filter(x=>x.platform=='instagram').map(mv));
+ (s.data||[]).forEach(x=>{SOCIAL[x.platform=='youtube'?'yt':'ig']={count:x.count,pending:x.status=='pending'}});
+}catch(e){console.error(e)}route()}
+const act=async q=>{const {error}=await q;if(error)return toast(error.message);toast('Saved');sync()};
+render.admin=async()=>{const el=$('#p-admin');const {data:{session}}=await sb.auth.getSession();
+ if(!session){el.innerHTML='<h1 class="it">Admin <s>//</s></h1><form id="fl" style="max-width:380px;display:grid;gap:12px"><input class="ai" name="e" type="email" placeholder="Email" aria-label="Email"><input class="ai" name="p" type="password" placeholder="Password" aria-label="Password"><button class="btn">LOG IN</button></form>';el.onsubmit=async e=>{e.preventDefault();const d=new FormData(e.target);const {error}=await sb.auth.signInWithPassword({email:d.get('e'),password:d.get('p')});error?toast(error.message):render.admin()};return}
+ const {data:pr}=await sb.from('profiles').select('role').eq('id',session.user.id).maybeSingle();
+ const out='<button class="btn" data-a="out" style="margin-top:8px">LOG OUT</button>';
+ if(pr?.role!='admin'){el.innerHTML='<h1 class="it">No access</h1><p class="sub">This account is not an admin.</p>'+out;el.onclick=async()=>{await sb.auth.signOut();sync()};return}
+ const [R,V,M]=await Promise.all([sb.from('resources').select('*').order('created_at',{ascending:false}),sb.from('videos').select('*').order('published_at',{ascending:false}),sb.from('contact_messages').select('*').order('created_at',{ascending:false})]);
+ const by=Object.fromEntries((R.data||[]).map(x=>[x.id,x])),opt=a=>a.map(x=>`<option>${x}</option>`).join(''),box='class="glass" style="display:grid;gap:10px;max-width:560px"';
+ el.innerHTML=`<h1 class="it">Admin <s>//</s></h1>${out}
+<h3>Add resource</h3><form id="fr" ${box}><input class="ai" name="title" placeholder="Title" required maxlength="160"><select class="ai sel" name="section"><option value="links">Links</option><option value="assets">Assets</option></select><select class="ai sel" name="category">${opt(['Games','Tools','Presets','Mods','Resources'])}</select><input class="ai" name="url" type="url" placeholder="External URL (https://…)"><textarea class="ai" name="description" placeholder="Description"></textarea><label>Thumbnail (image, max 2 MB) <input name="file" type="file" accept="image/*"></label><button class="btn">ADD RESOURCE</button></form>
+<h3>Resources (${R.data.length})</h3>${R.data.map(x=>`<div class="ar"><span>${H(x.title)} <small>${x.section} · ${x.views} views${x.visible?'':' · hidden'}</small></span><span><button data-a="rv" data-id="${x.id}" data-v="${x.visible}">${x.visible?'Hide':'Show'}</button><button data-a="re" data-id="${x.id}">Edit</button><button data-a="rd" data-id="${x.id}">Delete</button></span></div>`).join('')||'<p class="sub">None yet.</p>'}
+<h3>Add video or reel (manual)</h3><form id="fv" ${box}><select class="ai sel" name="platform"><option value="youtube">YouTube</option><option value="instagram">Instagram</option></select><select class="ai sel" name="kind">${opt(['video','short','live','reel'])}</select><input class="ai" name="title" placeholder="Title or caption" required><input class="ai" name="url" type="url" placeholder="Original URL" required><input class="ai" name="duration" placeholder="Duration e.g. 8:17"><input class="ai" name="thumb" type="url" placeholder="Thumbnail image URL"><input class="ai" name="views" type="number" min="0" placeholder="Views"><button class="btn">ADD</button></form>
+<h3>Videos (${V.data.length})</h3>${V.data.map(x=>`<div class="ar"><span>${H(x.title)} <small>${x.platform}/${x.kind}${x.visible?'':' · hidden'}</small></span><span><button data-a="vv" data-id="${x.id}" data-v="${x.visible}">${x.visible?'Hide':'Show'}</button><button data-a="vd" data-id="${x.id}">Delete</button></span></div>`).join('')||'<p class="sub">None yet.</p>'}
+<h3>Social counts (manual until sync is connected)</h3><form id="fs" ${box}><label>YouTube subscribers <input class="ai" name="yt" type="number" min="0" value="${SOCIAL.yt.count}"></label><label>Instagram followers <input class="ai" name="ig" type="number" min="0" value="${SOCIAL.ig.count}"></label><button class="btn">SAVE COUNTS</button></form>
+<h3>Messages (${M.data.length})</h3>${M.data.map(x=>`<div class="ar" style="align-items:flex-start;${x.is_read?'opacity:.6':''}"><span style="max-width:640px"><b>${H(x.name)}</b> <a href="mailto:${H(x.email)}" style="color:var(--red)">${H(x.email)}</a> <small>${new Date(x.created_at).toLocaleString()}${x.is_spam?' · SPAM':''}</small><br>${H(x.message)}</span><span><button data-a="mr" data-id="${x.id}" data-v="${x.is_read}">${x.is_read?'Mark unread':'Mark read'}</button><button data-a="ms" data-id="${x.id}" data-v="${x.is_spam}">${x.is_spam?'Not spam':'Spam'}</button><button data-a="md" data-id="${x.id}">Delete</button></span></div>`).join('')||'<p class="sub">No messages yet.</p>'}`;
+ el.onclick=async e=>{const b=e.target.closest('button[data-a]');if(!b)return;const a=b.dataset.a,id=b.dataset.id,fl=b.dataset.v!='true';let q;
+  if(a=='out'){await sb.auth.signOut();return sync()}
+  if(a=='rv')q=sb.from('resources').update({visible:fl}).eq('id',id);
+  if(a=='vv')q=sb.from('videos').update({visible:fl}).eq('id',id);
+  if(a=='mr')q=sb.from('contact_messages').update({is_read:fl}).eq('id',id);
+  if(a=='ms')q=sb.from('contact_messages').update({is_spam:fl}).eq('id',id);
+  if(a=='rd'||a=='vd'||a=='md'){if(!confirm('Delete permanently?'))return;q=sb.from({rd:'resources',vd:'videos',md:'contact_messages'}[a]).delete().eq('id',id)}
+  if(a=='re'){const x=by[id],t=prompt('Title',x.title);if(!t)return;const u=prompt('External URL',x.external_url||'');q=sb.from('resources').update({title:t,external_url:u||null,updated_at:new Date().toISOString()}).eq('id',id)}
+  if(q)act(q)};
+ el.onsubmit=async e=>{e.preventDefault();const f=e.target.id,d=new FormData(e.target);
+  if(f=='fr'){let th=null;const file=d.get('file');
+   if(file&&file.size){if(!file.type.startsWith('image/')||file.size>2e6)return toast('Thumbnail must be an image under 2 MB.');const path=Date.now()+'-'+file.name.replace(/[^\w.]/g,'_');const up=await sb.storage.from('thumbnails').upload(path,file);if(up.error)return toast(up.error.message);th=sb.storage.from('thumbnails').getPublicUrl(path).data.publicUrl}
+   act(sb.from('resources').insert({title:d.get('title'),section:d.get('section'),category:d.get('category'),external_url:d.get('url')||null,description:d.get('description')||null,thumbnail_url:th}))}
+  if(f=='fv')act(sb.from('videos').insert({platform:d.get('platform'),kind:d.get('kind'),title:d.get('title'),url:d.get('url'),duration:d.get('duration')||null,thumbnail_url:d.get('thumb')||null,view_count:+d.get('views')||0,manual:true}));
+  if(f=='fs'){for(const [p,k] of [['youtube','yt'],['instagram','ig']]){const {error}=await sb.from('social_stats').update({count:+d.get(k)||0,manual:true,status:'manual',last_synced_at:new Date().toISOString()}).eq('platform',p);if(error)return toast(error.message)}toast('Saved');sync()}};
+};
+$('#cf').onsubmit=async e=>{e.preventDefault();if($('#hp').value)return;const n=$('#cn').value.trim(),m=$('#ce').value.trim(),msg=$('#cm').value.trim();let ok=true;
+ const chk=(k,bad,t)=>{setE(k,bad?t:'');if(bad)ok=false};
+ chk('cn',n.length<2,'Enter your name.');chk('ce',!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(m),'Enter a valid email address.');chk('cm',msg.length<10,'Message must be at least 10 characters.');chk('ct',!$('#ct').checked,'Accept the Terms of Service to continue.');
+ if(!ok)return;const b=e.target.querySelector('.btn');b.disabled=true;b.textContent='SENDING…';
+ const {error}=await sb.from('contact_messages').insert({name:n,email:m,message:msg});
+ b.disabled=false;b.textContent='SUBMIT →';
+ if(error)return toast('Could not send your message. Please email blindspidy2@gmail.com instead.');
+ e.target.reset();toast('Message sent. Thank you!')};
+sync();
 </script></body></html>
