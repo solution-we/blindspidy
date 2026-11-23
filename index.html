@@ -343,4 +343,43 @@ render.admin=async()=>{const el=$('#p-admin');document.body.classList.add('adm')
   if(f=='fv')act(sb.from('videos').insert({platform:d.get('platform'),kind:d.get('kind'),title:d.get('title'),url:d.get('url'),duration:d.get('duration')||null,thumbnail_url:d.get('thumb')||null,view_count:+d.get('views')||0,manual:true}));
   if(f=='fs'){for(const [p,k] of [['youtube','yt'],['instagram','ig']]){const {error}=await sb.from('social_stats').update({count:+d.get(k)||0,manual:true,status:'manual',last_synced_at:new Date().toISOString()}).eq('platform',p);if(error)return toast(error.message)}toast('Saved');sync()}};
 };
+</script>
+<script>
+/* Background layer rebuilt from the reference screenshots */
+document.head.insertAdjacentHTML('beforeend',`<style>
+body::after{content:none!important}
+body::before{background:radial-gradient(55% 45% at 100% 100%,rgba(255,16,43,.32),transparent 70%),radial-gradient(35% 30% at 80% 0,rgba(255,16,43,.1),transparent 70%)}
+#bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+#bg svg,.bl{position:absolute;pointer-events:none}
+#bg svg{filter:drop-shadow(0 0 8px rgba(255,16,43,.35))}
+.tr-big,.tr-sm{top:0;right:0;display:none}
+.tr-big{width:clamp(520px,62vw,1030px);height:auto}
+.tr-sm{width:clamp(240px,26vw,440px);height:auto}
+body[data-p=home] .tr-big{display:block}
+body:not([data-p=home]) .tr-sm{display:block}
+.br{right:0;bottom:0;width:clamp(260px,30vw,500px);height:auto}
+.br .slab{display:none;filter:drop-shadow(0 0 12px #FF102B)}
+body[data-p=about] .br .slab{display:block}
+.bl{position:fixed;left:0;bottom:0;width:110px;height:240px;z-index:0;filter:drop-shadow(0 0 10px rgba(255,16,43,.65))}
+@media(min-width:900px){.bl{z-index:31}}
+body.adm #bg,body.adm .bl{display:none}
+.hero{position:relative;width:fit-content}
+.hero::after{content:'';position:absolute;right:-.42em;top:54%;width:.05em;height:.34em;background:var(--red);box-shadow:.14em 0 0 var(--red);transform:skewX(-28deg)}
+@media(min-width:900px){
+ .about{position:relative}.about::before{content:'';position:absolute;left:49%;top:-34px;height:230px;width:2px;background:linear-gradient(to top,var(--red),transparent);transform:rotate(16deg);transform-origin:bottom}
+ .contact{position:relative}.contact::before{content:'';position:absolute;left:46%;top:0;bottom:0;width:1.5px;background:linear-gradient(transparent,rgba(255,16,43,.85),transparent)}
+}
+@media(max-width:899px){
+ body[data-p=home] .tr-big{display:none}body .tr-sm{display:block;width:46vw;top:54px}
+ .bl{width:120px;height:260px;bottom:26vh}
+ .br{width:58vw}.br .slab{display:block}
+}
+</style>`);
+let dots='';for(let i=0;i<6;i++)for(const y of [155,185,215])dots+=`<circle cx='${1150+i*32}' cy='${y}' r='2' fill='#FF102B' fill-opacity='.85'/>`;
+document.body.insertAdjacentHTML('afterbegin',`<div id='bg' aria-hidden='true'>
+<svg class='tr-big' viewBox='640 0 1032 420' preserveAspectRatio='xMaxYMin meet'><defs><linearGradient id='g1' x1='0' y1='1' x2='1' y2='0'><stop offset='0' stop-color='#FF102B' stop-opacity='.55'/><stop offset='1' stop-color='#5a0010' stop-opacity='.08'/></linearGradient></defs><line x1='700' y1='155' x2='870' y2='0' stroke='#fff' stroke-opacity='.14'/><polygon points='1215,358 1460,105 1600,105 1370,358' fill='url(#g1)'/><polyline points='1215,358 1460,105 1672,105' fill='none' stroke='#FF102B' stroke-width='2'/><polyline points='920,400 1050,272 1300,272' fill='none' stroke='#8a8a8a' stroke-width='1.5'/><polyline points='1672,235 1560,347 1435,347' fill='none' stroke='#FF102B' stroke-opacity='.7' stroke-width='1.5'/><polyline points='1535,88 1550,75 1640,75' fill='none' stroke='#FF102B' stroke-width='1.5'/>${dots}</svg>
+<svg class='tr-sm' viewBox='1300 0 372 220' preserveAspectRatio='xMaxYMin meet'><defs><linearGradient id='g2' x1='0' y1='1' x2='1' y2='0'><stop offset='0' stop-color='#FF102B' stop-opacity='.6'/><stop offset='1' stop-color='#5a0010' stop-opacity='.1'/></linearGradient></defs><polygon points='1350,200 1450,95 1580,95 1470,200' fill='url(#g2)'/><polyline points='1350,200 1450,95 1600,95' fill='none' stroke='#FF102B' stroke-width='2'/><polyline points='1545,125 1600,65 1672,65' fill='none' stroke='#FF102B' stroke-opacity='.8' stroke-width='1.5'/></svg>
+<svg class='br' viewBox='0 0 480 300' preserveAspectRatio='xMaxYMax meet'><defs><linearGradient id='g3' x1='1' y1='1' x2='.3' y2='0'><stop offset='0' stop-color='#FF102B' stop-opacity='.5'/><stop offset='1' stop-color='#FF102B' stop-opacity='0'/></linearGradient></defs><polygon points='80,300 330,190 480,0 480,300' fill='url(#g3)'/><g class='slab'><polygon points='190,300 360,190 480,70 480,135 395,230 300,300' fill='#FF102B'/></g></svg>
+</div><svg class='bl' viewBox='0 0 110 240' aria-hidden='true'><polygon points='0,115 100,0 100,45 0,160' fill='#FF102B'/><polygon points='0,240 88,105 0,185' fill='#E0001F'/></svg>`);
+const setP=()=>{document.body.dataset.p=(location.hash.slice(1)||'home')};addEventListener('hashchange',setP);setP();
 </script></body></html>
