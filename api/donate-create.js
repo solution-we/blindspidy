@@ -1,4 +1,5 @@
 // POST /api/donate-create — validates, finds/creates donor, creates pending donation, creates FamGateway order.
+const crypto = require('crypto');
 const { rest, ist } = require('./_lib/shared');
 
 const clean = (s, max) => String(s || '').replace(/[\u0000-\u001f<>]/g, '').trim().slice(0, max);
@@ -47,10 +48,11 @@ module.exports = async (req, res) => {
   const pend = await (await rest(`donations?select=id&donor_id=eq.${donor.id}&created_at=gte.${since}`)).json();
   if (Array.isArray(pend) && pend.length >= 5) return res.status(429).json({ error: 'Too many attempts. Please wait a few minutes.' });
 
-  // Pending donation first, then the gateway order
+  // Pending donation first, then the gateway order. access_token lets only this browser resume the session.
+  const token = crypto.randomBytes(24).toString('hex');
   const ins = await rest('donations', {
     method: 'POST', headers: { Prefer: 'return=representation' },
-    body: JSON.stringify({ donor_id: donor.id, goal_id: goal.id, requested_amount: amount }),
+    body: JSON.stringify({ donor_id: donor.id, goal_id: goal.id, requested_amount: amount, access_token: token }),
   });
   const donation = ins.ok ? (await ins.json())[0] : null;
   if (!donation) return res.status(500).json({ error: 'Could not start the donation.' });
@@ -88,6 +90,6 @@ module.exports = async (req, res) => {
   return res.status(200).json({
     order_id: order.order_id, amount, payable_amount: Number(order.payable_amount),
     qr_url: order.qr_url, checkout_url: order.checkout_url, upi_intent: order.upi_intent,
-    expires_at: expires, goal_title: goal.title,
+    expires_at: expires, goal_title: goal.title, access_token: token,
   });
 };
