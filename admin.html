@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Admin | Blind Spidy</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Blind Spidy — Gaming, Tech, Edits and More.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:ital,wght@1,700;1,800;1,900&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#050505;--bg2:#101010;--card:#111;--red:#FF102B;--red2:#C90024;--tx:#fff;--tx2:#B7B7B7;--bd:#292929;--ig:linear-gradient(90deg,#f0f,#ff2d95 40%,#ffd35a);
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:400 16px/1.5 Inter,system-ui,sans-serif;min-height:100vh;overflow-x:hidden;position:relative}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(60% 40% at 100% 100%,rgba(255,16,43,.28),transparent 70%),radial-gradient(40% 30% at 85% 0,rgba(255,16,43,.14),transparent 70%);z-index:0}
+body::after{content:"";position:fixed;left:0;bottom:0;width:90px;height:260px;background:linear-gradient(160deg,transparent 55%,var(--red) 56%,var(--red) 70%,transparent 71%,transparent 80%,var(--red) 81%);opacity:.9;pointer-events:none;z-index:0;clip-path:polygon(0 100%,0 30%,100% 0,100% 100%)}
+a{color:inherit}button,input,textarea,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+.it{font-family:Montserrat,Inter,sans-serif;font-style:italic;font-weight:800;letter-spacing:-.02em}
+.mark{font-family:Montserrat,sans-serif;font-style:italic;font-weight:900;letter-spacing:-.03em;text-transform:uppercase;color:#fff;text-decoration:none}
+.mark b{color:var(--red)}
+/* shell */
+#side{display:none}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background:rgba(5,5,5,.9);backdrop-filter:blur(8px)}
+header.top .mark{font-size:20px;padding-bottom:6px;border-bottom:2px solid var(--red);clip-path:polygon(0 0,100% 0,88% 100%,0 100%);padding-right:22px}
+.burger{background:none;border:0;padding:8px;cursor:pointer}
+.burger i{display:block;width:26px;height:2px;background:#fff;margin:6px 0}
+#panel{position:fixed;inset:0 0 0 auto;width:min(78vw,320px);background:var(--bg2);border-left:1px solid var(--red2);transform:translateX(100%);transition:transform .25s;z-index:40;padding:80px 24px 24px;display:flex;flex-direction:column;gap:6px}
+#panel.open{transform:none}
+#panel a{padding:14px 12px;border-radius:12px;text-decoration:none;font-weight:600;border:1px solid transparent}
+#panel a.on{border-color:var(--red);background:rgba(255,16,43,.1)}
+#scrim{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:35;display:none}#scrim.open{display:block}
+main{position:relative;z-index:1;padding:8px 20px 56px;max-width:1500px}
+.page{display:none}.page.on{display:block}
+@media(min-width:900px){
+ header.top,#panel,#scrim{display:none!important}
+ #side{display:flex;position:fixed;inset:0 auto 0 0;width:100px;border-right:1px solid var(--bd);flex-direction:column;justify-content:center;align-items:center;gap:22px;z-index:30;background:var(--bg)}
+ #side a{width:54px;height:54px;display:grid;place-items:center;border-radius:14px;border:1px solid transparent;transition:.2s}
+ #side a:hover{border-color:var(--bd)}
+ #side a.on{border-color:var(--red);background:rgba(255,16,43,.12);box-shadow:0 0 18px rgba(255,16,43,.35);color:var(--red)}
+ main{margin-left:100px;padding:40px 56px 64px}
+ body::after{left:0;width:100px}
+}
+svg.ic{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.desk-logo{display:none}@media(min-width:900px){.desk-logo{display:inline-block;font-size:26px;margin-bottom:28px;padding-bottom:8px;border-bottom:2px solid var(--red);clip-path:polygon(0 0,100% 0,92% 100%,0 100%);padding-right:40px}}
+/* shared */
+h1.it{font-size:clamp(34px,6vw,60px);margin:0;line-height:1.05}h1 s{text-decoration:none;color:var(--red)}
+.sub{font-style:italic;color:var(--tx2);margin:6px 0 14px}
+.bar{width:82px;height:4px;background:var(--red);border-radius:2px;margin:0 0 24px}
+.tools{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:22px}
+.sel,.search{background:rgba(255,255,255,.03);border:1px solid #444;border-radius:14px;padding:11px 16px;min-height:44px}
+.sel{appearance:none;padding-right:38px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' fill='none' stroke='%23fff' stroke-width='2'%3E%3Cpath d='M1 1l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;cursor:pointer}
+.sel option{background:#111}
+.search{flex:1;min-width:140px;max-width:340px}
+/* home */
+.hero{font-size:clamp(60px,13vw,150px);line-height:.88;margin:30px 0 18px;text-transform:uppercase}
+.hero b{display:block;color:var(--red)}
+.tag{font-style:italic;font-size:clamp(16px,2.4vw,24px)}.tag::before{content:"“ ";color:var(--red);font-weight:800;font-size:1.3em}
+.stats{display:grid;gap:16px;margin:30px 0 18px}
+.glass{border-radius:22px;border:1.5px solid var(--red);background:linear-gradient(135deg,rgba(255,16,43,.16),rgba(0,0,0,.6));padding:20px 24px}
+.glass.ig{border-color:#c0f;background:linear-gradient(135deg,rgba(200,0,255,.14),rgba(0,0,0,.6))}
+.sh{display:flex;gap:14px;align-items:center;font-weight:700;line-height:1.2}.sh small{display:block;font-weight:400;color:var(--tx2);font-size:15px}
+.logo{width:48px;height:34px;border-radius:9px;background:var(--red);display:grid;place-items:center}.logo.ig{width:42px;height:42px;border-radius:11px;background:linear-gradient(45deg,#fd5,#ff543e 45%,#c837ab 75%,#4f5bd5)}
+.num{font-size:clamp(34px,4.5vw,50px);margin:10px 0 6px}.num small{font-size:.5em;color:var(--tx2);font-weight:700}
+.prog{display:flex;align-items:center;gap:16px;font-weight:700}.track{flex:1;height:14px;border-radius:9px;background:#2b2b2b;overflow:hidden}.fill{height:100%;width:0;background:var(--red);border-radius:9px;transition:width 1s cubic-bezier(.2,.7,.2,1)}.ig .fill{background:var(--ig)}
+.nav4{display:grid;gap:16px;grid-template-columns:1fr 1fr}
+.nc{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:104px;border-radius:20px;border:1.5px solid rgba(255,16,43,.6);background:linear-gradient(180deg,rgba(255,16,43,.1),rgba(0,0,0,.5));text-decoration:none;transition:.2s}
+.nc:hover{transform:translateY(-3px);box-shadow:0 0 22px rgba(255,16,43,.3)}
+.quote{grid-column:1/-1;text-align:center;border-radius:20px;border:1.5px solid var(--red2);padding:26px 16px;letter-spacing:.22em;font-size:14px;line-height:2}.quote i{display:block;width:80px;height:3px;background:var(--red);margin:10px auto 0}
+@media(min-width:900px){.stats{grid-template-columns:1fr 1fr}.nav4{grid-template-columns:repeat(4,1fr) 2.6fr}.quote{grid-column:auto}}
+/* grids */
+.grid{display:grid;gap:16px;grid-template-columns:repeat(2,1fr)}
+@media(min-width:700px){.grid{grid-template-columns:repeat(3,1fr)}}@media(min-width:1100px){.grid{grid-template-columns:repeat(4,1fr);gap:22px}}
+.card{display:flex;flex-direction:column;text-align:left;padding:0;cursor:pointer;border-radius:20px;overflow:hidden;border:1.5px solid #333;background:var(--card);transition:.2s;border-top-color:rgba(255,16,43,.7);border-bottom-color:rgba(255,16,43,.45)}
+.card:hover{transform:translateY(-3px);box-shadow:0 0 22px rgba(255,16,43,.28)}
+.th{aspect-ratio:16/9;position:relative;display:grid;place-items:center;font:800 italic clamp(26px,5vw,48px) Montserrat,sans-serif}
+.dur{position:absolute;right:8px;bottom:8px;background:rgba(0,0,0,.8);font:700 12px Inter;padding:2px 7px;border-radius:6px;font-style:normal}
+.cb{padding:12px 14px 14px}.ct{font-weight:600;font-size:clamp(14px,1.3vw,17px);line-height:1.3}
+.meta{display:flex;justify-content:space-between;gap:8px;margin-top:10px;color:var(--tx2);font-size:13px;flex-wrap:wrap}
+.pill{display:flex;gap:10px}.pill button,.tabs button{border:1px solid #444;background:rgba(255,255,255,.03);border-radius:14px;padding:10px 18px;min-height:44px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:.2s}
+.pill button.on{border-color:var(--red);background:rgba(255,16,43,.15);box-shadow:0 0 16px rgba(255,16,43,.3)}
+.pill button.on.i{border-color:#c0f;background:rgba(200,0,255,.14);box-shadow:0 0 16px rgba(200,0,255,.3)}
+.tabs{display:flex;gap:8px;border-bottom:1px solid var(--bd);margin-bottom:18px;padding-bottom:12px}.tabs button{border:0;background:none}.tabs button.on{background:var(--red2)}
+.empty{grid-column:1/-1;padding:40px;border:1px dashed var(--bd);border-radius:18px;color:var(--tx2);text-align:center}
+.vh{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px}
+/* about */
+.about{display:grid;gap:26px}.lab{font:700 28px 'Barlow Condensed',sans-serif;color:var(--red);display:flex;gap:14px;align-items:center;text-transform:uppercase}.lab::after{content:"";width:48px;height:3px;background:var(--red)}
+.about h2{margin:.1em 0;font-size:clamp(40px,8vw,84px)}.about h2 s,.contact h2 s{text-decoration:none;color:var(--red)}
+.lead{font-size:clamp(17px,2vw,26px);max-width:620px}
+hr.d{border:0;height:1px;background:linear-gradient(90deg,transparent,var(--red),transparent);margin:44px 0}
+.contact{display:grid;gap:30px}.contact h2{font-size:clamp(32px,5vw,50px);margin:0 0 12px}
+.cl{display:flex;flex-wrap:wrap;gap:14px;margin-top:22px}.cl a{display:flex;gap:12px;align-items:center;text-decoration:none;border:1.5px solid var(--red2);border-radius:16px;padding:10px 14px;background:rgba(255,16,43,.07);font-size:14px}.cl a b{display:block}
+form{display:grid;gap:14px}.f{position:relative}.f svg{position:absolute;left:18px;top:15px;width:22px;height:22px}
+.f input,.f textarea{width:100%;background:rgba(0,0,0,.5);border:1.5px solid #bbb;border-radius:16px;padding:14px 16px 14px 58px;min-height:52px}.f textarea{min-height:110px;resize:vertical}
+.f input::placeholder,.f textarea::placeholder{color:#cfcfcf}.f [aria-invalid=true]{border-color:var(--red)}
+.err{color:#ff6b7c;font-size:13px;margin:4px 6px 0;min-height:0}
+.chk{display:flex;gap:10px;align-items:center}.chk input{width:20px;height:20px;accent-color:var(--red)}.chk a{color:var(--red)}
+.btn{justify-self:start;background:var(--red);border:0;border-radius:40px;padding:14px 34px;font-weight:800;font-size:18px;cursor:pointer;transition:.2s;min-height:52px}.btn:hover{background:var(--red2);box-shadow:0 0 20px rgba(255,16,43,.5)}
+.note{font-size:13px;color:var(--tx2);border-left:3px solid var(--red);padding-left:10px}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);background:#1a1a1a;border:1px solid var(--red);padding:12px 18px;border-radius:12px;opacity:0;transition:.25s;z-index:60;max-width:90vw;pointer-events:none}#toast.on{opacity:1;transform:translate(-50%,0)}
+@media(min-width:900px){.about{grid-template-columns:1.1fr 1fr;align-items:center}.contact{grid-template-columns:1fr 1.1fr}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style><style>body.adm #side,body.adm header.top,body.adm .desk-logo{display:none!important}body.adm main{margin:0;padding:0;max-width:none}body.adm::after{display:none}
+.ad{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:100vh}.as{border-right:1px solid var(--bd);padding:22px 14px;display:flex;flex-direction:column;gap:6px;position:sticky;top:0;height:100vh}
+.as .n{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:12px;border:1px solid transparent;background:none;cursor:pointer;text-align:left;width:100%}.as .n.on{background:linear-gradient(90deg,#8d0f1d,#3a0509);border-color:var(--red2)}.as .n b{margin-left:auto;background:var(--red);border-radius:8px;padding:0 7px;font-size:12px}
+.am{padding:24px 28px}.sg{display:grid;gap:14px;grid-template-columns:repeat(5,minmax(0,1fr));margin:20px 0}.sc{display:flex;gap:12px;align-items:center;padding:16px}.sc i{width:48px;height:48px;border-radius:12px;background:rgba(255,16,43,.25);border:1px solid var(--red2);display:grid;place-items:center;flex:none}.sc small{display:block;color:var(--tx2);font-size:13px}.sc strong{font-size:24px}
+.ag{display:grid;gap:16px;grid-template-columns:minmax(0,2fr) minmax(0,1fr);margin-bottom:16px}.ag3{display:grid;gap:16px;grid-template-columns:repeat(3,minmax(0,1fr))}.ag h3,.am h3{margin:0 0 12px}
+.ok{background:rgba(0,200,90,.15);color:#3be07f;border-radius:8px;padding:2px 10px;font-size:13px}.qa{display:grid;grid-template-columns:1fr 1fr;gap:10px}.qa button{border:1px solid #444;background:none;border-radius:14px;padding:16px 8px;cursor:pointer;display:grid;gap:6px;justify-items:center}
+@media(max-width:1100px){.sg{grid-template-columns:repeat(2,minmax(0,1fr))}.ag,.ag3{grid-template-columns:1fr}}
+@media(max-width:800px){.ad{grid-template-columns:1fr}.as{position:static;height:auto;flex-direction:row;flex-wrap:wrap;border-right:0;border-bottom:1px solid var(--bd)}.as .n{width:auto}.am{padding:18px 14px}}
+</style></head>
+<body class="adm"><main><section class="page on" id="p-admin"></section></main><div id="toast" role="status"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ago=d=>d<7?d+' day'+(d>1?'s':'')+' ago':d<30?Math.floor(d/7)+' week'+(d>=14?'s':'')+' ago':Math.floor(d/30)+' month'+(d>=60?'s':'')+' ago';
+const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('on'),2600)};
+const money=n=>'₹'+Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2});
+const render={};
+function sync(){return render.admin()}
+
+
+const sb=supabase.createClient('https://mnwajosoystfikvhjdyf.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ud2Fqb3NveXN0ZmlrdmhqZHlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU0MTg4NjYsImV4cCI6MjExMDk5NDg2Nn0.eHwS2FfGka3-yR3cnczAHo5jPx0WO4t8YUDtjW2Uiyg');
+const rel=iso=>Math.max(0,Math.floor((Date.now()-new Date(iso))/864e5)),H=s=>esc(String(s??''));
+document.head.insertAdjacentHTML('beforeend','<style>.ai{background:rgba(0,0,0,.5);border:1px solid #666;border-radius:12px;padding:10px 12px;width:100%;min-height:44px}.ar{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bd);flex-wrap:wrap}.ar button{border:1px solid #555;background:none;border-radius:10px;padding:8px 12px;cursor:pointer;margin-left:6px}.ar small{color:var(--tx2)}#p-admin h3{margin:32px 0 12px}</style>');
+const act=async q=>{const {error}=await q;if(error)return toast(error.message);toast('Saved');sync()};
+const ic=p=>`<svg class='ic' viewBox='0 0 24 24'>${p}</svg>`;
+const P={home:'<path d="M3 11l9-8 9 8M5 10v10h14V10"/>',layers:'<path d="M12 3l9 5-9 5-9-5zM3 13l9 5 9-5"/>',img:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/>',play:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9l5 3-5 3z"/>',mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',users:'<circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-4 3-6 7-6s7 2 7 6M16 4a3.5 3.5 0 0 1 0 7M18 14c2.5.5 4 2.5 4 6"/>',eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',ext:'<path d="M14 4h6v6M20 4l-9 9M18 14v6H4V6h6"/>',sync:'<path d="M20 11a8 8 0 0 0-14-4M4 4v4h4M4 13a8 8 0 0 0 14 4M20 20v-4h-4"/>',plus:'<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>'};
+
+const NAVA=[['dash','Dashboard','home'],['res','Resources','layers'],['ast','Assets','img'],['vid','Videos','play'],['msg','Messages','mail'],['soc','Social Stats','users']];
+let av='dash';
+const when=iso=>{const d=rel(iso);return d?ago(d):'today'};
+render.admin=async()=>{const el=$('#p-admin');document.body.classList.add('adm');const {data:{session}}=await sb.auth.getSession();
+ if(!session){el.innerHTML=`<div class='am'><h1 class='it'>Admin <s>//</s></h1><form id='fl' style='max-width:380px;display:grid;gap:12px'><input class='ai' name='e' type='email' placeholder='Email' aria-label='Email'><input class='ai' name='p' type='password' placeholder='Password' aria-label='Password'><button class='btn'>LOG IN</button></form></div>`;el.onclick=null;el.onsubmit=async e=>{e.preventDefault();const d=new FormData(e.target);const {error}=await sb.auth.signInWithPassword({email:d.get('e'),password:d.get('p')});error?toast(error.message):render.admin()};return}
+ const {data:pr}=await sb.from('profiles').select('role').eq('id',session.user.id).maybeSingle();
+ if(pr?.role!='admin'){el.innerHTML=`<div class='am'><h1 class='it'>No access</h1><p class='sub'>This account is not an admin.</p><button class='btn' data-a='out'>LOG OUT</button></div>`;el.onclick=async()=>{await sb.auth.signOut();sync()};return}
+ const since=new Date(Date.now()-30*864e5).toISOString();
+ const [R,V,M,S,T,TC]=await Promise.all([sb.from('resources').select('*').order('created_at',{ascending:false}),sb.from('videos').select('*').order('published_at',{ascending:false}),sb.from('contact_messages').select('*').order('created_at',{ascending:false}),sb.from('social_stats').select('*'),sb.from('site_visits').select('visited_at').gte('visited_at',since).limit(5000),sb.from('site_visits').select('*',{count:'exact',head:true})]);
+ const rs=R.data||[],vs=V.data||[],ms=M.data||[],ss=Object.fromEntries((S.data||[]).map(x=>[x.platform,x])),unread=ms.filter(x=>!x.is_read&&!x.is_spam).length,by=Object.fromEntries(rs.map(x=>[x.id,x]));
+ const opt=a=>a.map(x=>`<option>${x}</option>`).join(''),box=`class='glass' style='display:grid;gap:10px;max-width:560px'`;
+ const stat=(i,l,n)=>`<div class='glass sc'><i>${ic(P[i])}</i><div><small>${l}</small><strong>${n}</strong></div></div>`;
+ const rrow=x=>`<div class='ar'><span>${H(x.title)} <small>${x.section} · ${x.category} · ${x.views} views${x.visible?'':' · hidden'}</small></span><span><button data-a='rv' data-id='${x.id}' data-v='${x.visible}'>${x.visible?'Hide':'Show'}</button><button data-a='re' data-id='${x.id}'>Edit</button><button data-a='rd' data-id='${x.id}'>Delete</button></span></div>`;
+ const rform=sec=>`<form id='fr' ${box}><input type='hidden' name='section' value='${sec}'><input class='ai' name='title' placeholder='Title' required maxlength='160'><select class='ai sel' name='category'>${opt(['Games','Tools','Presets','Mods','Resources'])}</select><input class='ai' name='url' type='url' placeholder='External URL (https://...)'><textarea class='ai' name='description' placeholder='Description'></textarea><label>Thumbnail (image, max 2 MB) <input name='file' type='file' accept='image/*'></label><button class='btn'>ADD</button></form>`;
+ const msgrow=x=>`<div class='ar' style='align-items:flex-start;${x.is_read?'opacity:.6':''}'><span style='max-width:640px'><b>${H(x.name)}</b> <a href='mailto:${H(x.email)}' style='color:var(--red)'>${H(x.email)}</a> <small>${when(x.created_at)}${x.is_spam?' · SPAM':''}</small><br>${H(x.message)}</span><span><button data-a='mr' data-id='${x.id}' data-v='${x.is_read}'>${x.is_read?'Unread':'Read'}</button><button data-a='ms' data-id='${x.id}' data-v='${x.is_spam}'>${x.is_spam?'Not spam':'Spam'}</button><button data-a='md' data-id='${x.id}'>Delete</button></span></div>`;
+ const syn=(p,n)=>{const s=ss[p];return `<div class='ar'><span>${n}<br><small>${s?.last_synced_at?'Last updated '+when(s.last_synced_at):'Never updated'}</small></span><span class='ok' style='${s&&(s.status=='synced'||s.manual)?'':'background:rgba(255,160,0,.15);color:#ffb020'}'>${s?.status=='synced'?'Synced':s?.manual?'Manual':s?.status=='error'?'Error':'Pending'}</span></div>`};
+ let main='';
+ if(av=='dash'){const days=[...Array(30)].map((_,i)=>new Date(Date.now()-(29-i)*864e5).toISOString().slice(0,10)),cnt=Object.fromEntries(days.map(d=>[d,0]));(T.data||[]).forEach(x=>{const k=x.visited_at.slice(0,10);if(k in cnt)cnt[k]++});
+  const ys=days.map(d=>cnt[d]),mx=Math.max(...ys,1),line=ys.map((y,i)=>(i?'L':'M')+(i*600/29).toFixed(1)+' '+(170-y/mx*150).toFixed(1)).join('');
+  const chart=`<svg viewBox='0 0 600 190' style='width:100%'><defs><linearGradient id='gr' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='#FF102B' stop-opacity='.5'/><stop offset='1' stop-color='#FF102B' stop-opacity='0'/></linearGradient></defs><path d='${line}L600 170L0 170Z' fill='url(#gr)'/><path d='${line}' fill='none' stroke='#FF102B' stroke-width='2'/><text x='0' y='188' fill='#B7B7B7' font-size='11'>${days[0].slice(5)}</text><text x='600' y='188' fill='#B7B7B7' font-size='11' text-anchor='end'>${days[29].slice(5)}</text><text x='0' y='12' fill='#B7B7B7' font-size='11'>peak ${mx}/day</text></svg>`;
+  main=`<div class='sg'>${stat('eye','Website Visits',(TC.count||0).toLocaleString())}${stat('layers','Total Resources',rs.length)}${stat('play','Total Videos',vs.length)}${stat('play','YouTube Subs',(ss.youtube?.count||0).toLocaleString())}${stat('users','Instagram Followers',(ss.instagram?.count||0).toLocaleString())}</div>
+  <div class='ag'><div class='glass'><h3>Website Traffic (last 30 days)</h3>${chart}</div><div class='glass'><h3>Social Sync Status</h3>${syn('youtube','YouTube')}${syn('instagram','Instagram')}<button class='btn' data-a='sn' style='margin-top:14px;width:100%'>SYNC NOW</button></div></div>
+  <div class='ag3'><div class='glass'><h3>Recent Resources</h3>${rs.slice(0,4).map(x=>`<div class='ar'><span>${H(x.title)}<br><small>${x.category} · ${when(x.created_at)}</small></span><small>${x.views} views</small></div>`).join('')||'<p class=sub>None yet.</p>'}</div><div class='glass'><h3>Recent Messages</h3>${ms.slice(0,4).map(x=>`<div class='ar'><span>${H(x.name)}<br><small>${H(x.message.slice(0,40))}</small></span><small>${when(x.created_at)}</small></div>`).join('')||'<p class=sub>No messages yet.</p>'}</div><div class='glass'><h3>Quick Actions</h3><div class='qa'><button data-go='res'>${ic(P.plus)}Add Resource</button><button data-go='vid'>${ic(P.plus)}Add Video</button><button data-go='ast'>${ic(P.plus)}Add Asset</button><button data-go='soc'>${ic(P.sync)}Sync Accounts</button></div></div></div>`}
+ if(av=='res'||av=='ast'){const sec=av=='res'?'links':'assets';main=`<h3>Add ${sec=='links'?'resource':'asset'}</h3>${rform(sec)}<h3>All ${sec}</h3>${rs.filter(x=>x.section==sec).map(rrow).join('')||'<p class=sub>None yet.</p>'}`}
+ if(av=='vid')main=`<h3>Add video or reel (manual)</h3><form id='fv' ${box}><select class='ai sel' name='platform'><option value='youtube'>YouTube</option><option value='instagram'>Instagram</option></select><select class='ai sel' name='kind'>${opt(['video','short','live','reel'])}</select><input class='ai' name='title' placeholder='Title or caption' required><input class='ai' name='url' type='url' placeholder='Original URL' required><input class='ai' name='duration' placeholder='Duration e.g. 8:17'><input class='ai' name='thumb' type='url' placeholder='Thumbnail image URL'><input class='ai' name='views' type='number' min='0' placeholder='Views'><button class='btn'>ADD</button></form><h3>Videos (${vs.length})</h3>${vs.map(x=>`<div class='ar'><span>${H(x.title)} <small>${x.platform}/${x.kind}${x.visible?'':' · hidden'}</small></span><span><button data-a='vv' data-id='${x.id}' data-v='${x.visible}'>${x.visible?'Hide':'Show'}</button><button data-a='vd' data-id='${x.id}'>Delete</button></span></div>`).join('')||'<p class=sub>None yet.</p>'}`;
+ if(av=='msg')main=`<h3>Messages (${ms.length})</h3>${ms.map(msgrow).join('')||'<p class=sub>No messages yet.</p>'}`;
+ if(av=='soc')main=`<h3>Social counts (manual until API sync is connected)</h3><form id='fs' ${box}><label>YouTube subscribers <input class='ai' name='yt' type='number' min='0' value='${ss.youtube?.count||0}'></label><label>Instagram followers <input class='ai' name='ig' type='number' min='0' value='${ss.instagram?.count||0}'></label><button class='btn'>SAVE COUNTS</button></form><h3>Status</h3>${syn('youtube','YouTube')}${syn('instagram','Instagram')}`;
+ el.innerHTML=`<div class='ad'><nav class='as'><a class='mark' href='/' style='font-size:22px;margin-bottom:16px'>Blind <b>Spidy.</b></a>${NAVA.map(([k,l,i])=>`<button class='n${av==k?' on':''}' data-go='${k}'>${ic(P[i])}${l}${k=='msg'&&unread?`<b>${unread}</b>`:''}</button>`).join('')}<a class='n' href='/' style='margin-top:auto;text-decoration:none;border-color:#444'>${ic(P.ext)}View Website</a><button class='n' data-a='out'>Log out</button></nav><div class='am'><div class='lab' style='font-size:20px'>Admin</div><h1 class='it' style='font-size:40px'>${NAVA.find(n=>n[0]==av)[1]}</h1>${main}</div></div>`;
+ el.onclick=async e=>{const g=e.target.closest('[data-go]');if(g){av=g.dataset.go;return render.admin()}const b=e.target.closest('button[data-a]');if(!b)return;const a=b.dataset.a,id=b.dataset.id,fl=b.dataset.v!='true';let q;
+  if(a=='out'){await sb.auth.signOut();return sync()}
+  if(a=='sn'){b.disabled=true;toast('Syncing YouTube...');const {data:{session:s}}=await sb.auth.getSession();try{const r=await fetch('/api/sync-youtube',{method:'POST',headers:{Authorization:'Bearer '+s.access_token}});const j=await r.json();toast(r.ok?'YouTube synced: '+j.videos+' videos':(j.error||'Sync failed'))}catch(_){toast('Sync failed')}b.disabled=false;return sync()}
+  if(a=='rv')q=sb.from('resources').update({visible:fl}).eq('id',id);
+  if(a=='vv')q=sb.from('videos').update({visible:fl}).eq('id',id);
+  if(a=='mr')q=sb.from('contact_messages').update({is_read:fl}).eq('id',id);
+  if(a=='ms')q=sb.from('contact_messages').update({is_spam:fl}).eq('id',id);
+  if(a=='rd'||a=='vd'||a=='md'){if(!confirm('Delete permanently?'))return;q=sb.from({rd:'resources',vd:'videos',md:'contact_messages'}[a]).delete().eq('id',id)}
+  if(a=='re'){const x=by[id],t=prompt('Title',x.title);if(!t)return;const u=prompt('External URL',x.external_url||'');q=sb.from('resources').update({title:t,external_url:u||null,updated_at:new Date().toISOString()}).eq('id',id)}
+  if(q)act(q)};
+ el.onsubmit=async e=>{e.preventDefault();const f=e.target.id,d=new FormData(e.target);
+  if(f=='fr'){let th=null;const file=d.get('file');
+   if(file&&file.size){if(!file.type.startsWith('image/')||file.size>2e6)return toast('Thumbnail must be an image under 2 MB.');const path=Date.now()+'-'+file.name.replace(/[^a-z0-9.]/gi,'_');const up=await sb.storage.from('thumbnails').upload(path,file);if(up.error)return toast(up.error.message);th=sb.storage.from('thumbnails').getPublicUrl(path).data.publicUrl}
+   act(sb.from('resources').insert({title:d.get('title'),section:d.get('section'),category:d.get('category'),external_url:d.get('url')||null,description:d.get('description')||null,thumbnail_url:th}))}
+  if(f=='fv')act(sb.from('videos').insert({platform:d.get('platform'),kind:d.get('kind'),title:d.get('title'),url:d.get('url'),duration:d.get('duration')||null,thumbnail_url:d.get('thumb')||null,view_count:+d.get('views')||0,manual:true}));
+  if(f=='fs'){for(const [p,k] of [['youtube','yt'],['instagram','ig']]){const {error}=await sb.from('social_stats').update({count:+d.get(k)||0,manual:true,status:'manual',last_synced_at:new Date().toISOString()}).eq('platform',p);if(error)return toast(error.message)}toast('Saved');sync()}};
+};
+
+/* ---- Admin: Goals and Donations views ---- */
+NAVA.push(['gol','Goals','img'],['don','Donations','mail']);
+const baseAdmin=render.admin;let dfil='all';
+const upImg=async f=>{if(!f||!f.size)return null;if(!f.type.startsWith('image/')||f.size>2e6){toast('Image must be under 2 MB.');throw 0}const p='goals/'+Date.now()+'-'+f.name.replace(/[^a-z0-9.]/gi,'_');const u=await sb.storage.from('thumbnails').upload(p,f);if(u.error){toast(u.error.message);throw 0}return sb.storage.from('thumbnails').getPublicUrl(p).data.publicUrl};
+const st2=(i,l,n)=>`<div class='glass sc'><i>${ic(P[i])}</i><div><small>${l}</small><strong>${n}</strong></div></div>`;
+render.admin=async()=>{await baseAdmin();if(av!='gol'&&av!='don')return;const am=document.querySelector('#p-admin .ad .am');if(!am)return;am.insertAdjacentHTML('beforeend',av=='gol'?await goalsHTML():await donHTML())};
+async function goalsHTML(){const [g,d]=await Promise.all([sb.from('fundraising_goals').select('*').is('archived_at',null).order('display_order'),sb.from('donations').select('goal_id,confirmed_amount').eq('payment_status','success')]);
+ const tot={};(d.data||[]).forEach(x=>tot[x.goal_id]=(tot[x.goal_id]||0)+Number(x.confirmed_amount));
+ return `<h3>Add goal</h3><form id='fg' class='glass' style='display:grid;gap:10px;max-width:560px'><input class='ai' name='title' placeholder='Title (e.g. Buy Me a PS5)' required maxlength='80'><textarea class='ai' name='description' placeholder='Short description' maxlength='200'></textarea><input class='ai' name='target' type='number' min='1' step='1' placeholder='Target amount (INR)' required><input class='ai' name='ord' type='number' placeholder='Display order (0 first)'><input class='ai' name='alt' placeholder='Image alt text (optional)'><label>Photo (max 2 MB) <input name='file' type='file' accept='image/*'></label><label>Image focus, horizontal <input name='px' type='range' min='0' max='100' value='50'></label><label>Image focus, vertical <input name='py' type='range' min='0' max='100' value='50'></label><label><input type='checkbox' name='pub'> Publish immediately</label><button class='btn'>ADD GOAL</button></form><h3>Goals</h3>${(g.data||[]).map(x=>`<div class='ar'><span>${H(x.title)} <small>${money(tot[x.id]||0)} / ${money(x.target_amount)} &middot; order ${x.display_order} &middot; ${x.is_active?'active':'inactive'} &middot; ${x.is_published?'published':'draft'}${x.is_completed?' &middot; completed':''}</small></span><span><button data-g='act' data-id='${x.id}' data-v='${x.is_active}'>${x.is_active?'Deactivate':'Activate'}</button><button data-g='pub' data-id='${x.id}' data-v='${x.is_published}'>${x.is_published?'Unpublish':'Publish'}</button><button data-g='done' data-id='${x.id}' data-v='${x.is_completed}'>${x.is_completed?'Reopen':'Mark completed'}</button><button data-g='edit' data-id='${x.id}' data-t='${H(x.title)}' data-tg='${x.target_amount}' data-o='${x.display_order}' data-p='${H(x.image_position)}'>Edit</button><button data-g='del' data-id='${x.id}' data-t='${H(x.title)}'>Delete</button><label>Change image<input type='file' accept='image/*' data-g='img' data-id='${x.id}' hidden></label></span></div>`).join('')||`<p class='sub'>No goals yet.</p>`}`}
+async function donHTML(){let q=sb.from('donations').select('*,donors(private_name,normalized_email),fundraising_goals(title)').order('created_at',{ascending:false}).limit(100);if(dfil!='all')q=q.eq('payment_status',dfil);
+ const [D,E,S,A]=await Promise.all([q,sb.from('payment_events').select('*').order('received_at',{ascending:false}).limit(8),sb.from('site_settings').select('key,value'),sb.from('donations').select('confirmed_amount,donors(id,private_name,public_display_name,name_hidden,avatar_url)').eq('payment_status','success')]);
+ const st=Object.fromEntries((S.data||[]).map(x=>[x.key,x.value])),ok=A.data||[],tot={};
+ ok.forEach(x=>{const d=x.donors;if(!d)return;(tot[d.id]=tot[d.id]||{d,t:0}).t+=Number(x.confirmed_amount)});
+ const top=Object.values(tot).sort((a,b)=>b.t-a.t).slice(0,10),sum=ok.reduce((s,x)=>s+Number(x.confirmed_amount),0);
+ return `<div class='sg' style='grid-template-columns:repeat(3,minmax(0,1fr))'>${st2('eye','Verified total',money(sum))}${st2('users','Supporters',Object.keys(tot).length)}${st2('layers','Verified donations',ok.length)}</div>
+<h3>Donation settings</h3><form id='fst' class='glass' style='display:grid;gap:10px;max-width:560px'><label>Minimum amount (INR) <input class='ai' name='min' type='number' min='1' value='${st.donation_min||10}'></label><label>Maximum amount (INR) <input class='ai' name='max' type='number' min='1' value='${st.donation_max||10000}'></label><label>Suggested amounts (comma separated) <input class='ai' name='amts' value='${(st.donation_amounts||[49,99,199,499]).join(', ')}'></label><label>Leaderboard rows on homepage <input class='ai' name='lim' type='number' min='1' max='20' value='${st.leaderboard_limit||5}'></label><button class='btn'>SAVE SETTINGS</button></form>
+<h3>Leaderboard moderation</h3>${top.map(x=>`<div class='ar'><span>${H(x.d.public_display_name||'(no public name)')} <small>${H(x.d.private_name)} &middot; ${money(x.t)}${x.d.name_hidden?' &middot; name hidden':''}</small></span><span><button data-g='hn' data-id='${x.d.id}' data-v='${x.d.name_hidden}'>${x.d.name_hidden?'Show name':'Hide name'}</button>${x.d.avatar_url?`<button data-g='av' data-id='${x.d.id}'>Remove avatar</button>`:''}</span></div>`).join('')||`<p class='sub'>No supporters yet.</p>`}
+<h3>Donations</h3><label>Status <select class='ai sel' id='dfl' style='width:auto'>${['all','success','pending','expired','failed'].map(s=>`<option ${s==dfil?'selected':''}>${s}</option>`).join('')}</select></label>${(D.data||[]).map(x=>`<div class='ar'><span>${H(x.donors?.private_name)} <small>${H(x.donors?.normalized_email)} &middot; ${H(x.fundraising_goals?.title)} &middot; ${money(x.confirmed_amount||x.requested_amount)} &middot; ${x.payment_status}<br>${H(x.famgateway_order_id)} &middot; UTR ${H(x.utr||'-')} &middot; TXN ${H(x.transaction_id||'-')} &middot; ${new Date(x.created_at).toLocaleString()}</small></span></div>`).join('')||`<p class='sub'>None.</p>`}
+<h3>Latest payment events</h3>${(E.data||[]).map(x=>`<div class='ar'><span>${H(x.event_type)} &middot; ${H(x.order_id||'-')} <small>${x.signature_verified?'signature ok':'BAD SIGNATURE'} &middot; ${H(x.processing_status||'')} &middot; ${new Date(x.received_at).toLocaleString()}</small></span></div>`).join('')||`<p class='sub'>None.</p>`}`}
+const adm=$('#p-admin');
+adm.addEventListener('click',e=>{const b=e.target.closest('button[data-g]');if(!b)return;const a=b.dataset.g,id=b.dataset.id,fl=b.dataset.v!='true',T='fundraising_goals',now=new Date().toISOString();let q;
+ if(a=='act')q=sb.from(T).update({is_active:fl,updated_at:now}).eq('id',id);
+ if(a=='pub')q=sb.from(T).update({is_published:fl,updated_at:now}).eq('id',id);
+ if(a=='done')q=sb.from(T).update({is_completed:fl,updated_at:now}).eq('id',id);
+ if(a=='edit'){const t=prompt('Title',b.dataset.t);if(!t)return;const tg=+prompt('Target amount (INR)',b.dataset.tg);if(!(tg>0))return;const o=parseInt(prompt('Display order (lower shows first)',b.dataset.o),10)||0;const ps=prompt('Image focus, e.g. 50% 30%',b.dataset.p)||'50% 50%';q=sb.from(T).update({title:t,target_amount:tg,display_order:o,image_position:ps,updated_at:now}).eq('id',id)}
+ if(a=='del'){if(!confirm('Delete "'+b.dataset.t+'"?\n\nIt disappears from the website right away. Donations already received stay in your records and totals; nothing financial is erased.'))return;q=sb.from(T).update({archived_at:now,is_active:false,is_published:false,updated_at:now}).eq('id',id)}
+ if(a=='hn')q=sb.from('donors').update({name_hidden:fl,updated_at:now}).eq('id',id);
+ if(a=='av')q=sb.from('donors').update({avatar_url:null,updated_at:now}).eq('id',id);
+ if(q)act(q)});
+adm.addEventListener('change',async e=>{const t=e.target;
+ if(t.dataset.g=='img'){try{const u=await upImg(t.files[0]);if(u)act(sb.from('fundraising_goals').update({image_url:u,updated_at:new Date().toISOString()}).eq('id',t.dataset.id))}catch(_){}}
+ if(t.id=='dfl'){dfil=t.value;render.admin()}});
+adm.addEventListener('submit',async e=>{const f=e.target;if(f.id!='fg'&&f.id!='fst')return;e.preventDefault();const d=new FormData(f);
+ if(f.id=='fg'){try{const u=await upImg(d.get('file'));act(sb.from('fundraising_goals').insert({title:d.get('title'),description:d.get('description')||null,target_amount:+d.get('target'),image_url:u,image_alt:d.get('alt')||null,image_position:d.get('px')+'% '+d.get('py')+'%',is_published:d.get('pub')=='on',display_order:+d.get('ord')||0}))}catch(_){}}
+ if(f.id=='fst'){const am=String(d.get('amts')).split(',').map(x=>+x.trim()).filter(x=>x>0);act(sb.from('site_settings').upsert([{key:'donation_min',value:+d.get('min')},{key:'donation_max',value:+d.get('max')},{key:'donation_amounts',value:am},{key:'leaderboard_limit',value:+d.get('lim')}]))}});
+
+const checkMedia=f=>new Promise(ok=>{if(!f)return ok('');const im=['image/png','image/jpeg','image/webp'].includes(f.type),vd=['video/mp4','video/webm'].includes(f.type);if(!im&&!vd)return ok('Use a PNG, JPG, WebP, MP4 or WebM file.');if(f.size>10485760)return ok('File must be 10 MB or smaller.');if(im)return ok('');const u=URL.createObjectURL(f),v=document.createElement('video');v.preload='metadata';v.onloadedmetadata=()=>{URL.revokeObjectURL(u);ok(v.duration>5.05?'Video must be 5 seconds or shorter.':'')};v.onerror=()=>ok('Could not read this video.');v.src=u});
+const upMedia=async f=>{if(!f||!f.size)return null;const er=await checkMedia(f);if(er){toast(er);throw 0}const ext={'video/mp4':'mp4','video/webm':'webm','image/png':'png','image/webp':'webp'}[f.type]||'jpg';const p='ads/'+Date.now()+'-'+Math.random().toString(36).slice(2,7)+'.'+ext;const u=await sb.storage.from('thumbnails').upload(p,f,{contentType:f.type});if(u.error){toast(u.error.message);throw 0}return sb.storage.from('thumbnails').getPublicUrl(p).data.publicUrl};
+
+/* Admin: Advertising view + payment diagnostics */
+NAVA.push(['adv','Advertising','layers']);const adminPrev=render.admin;let afil='all';
+const act2=async q=>{const {error}=await q;if(error)return toast(/ad_campaigns_check/.test(error.message)?'The end date must be after the start date.':/overlap|exclusion|conflict/i.test(error.message)?'That slot already has an active campaign in this period.':error.message);toast('Saved');sync()};
+render.admin=async()=>{await adminPrev();const am=document.querySelector('#p-admin .ad .am');if(!am)return;
+ if(av=='don')am.insertAdjacentHTML('beforeend',`<h3>Payment diagnostics</h3><div class='glass' style='max-width:620px'><button class='btn' data-ad='diag'>RUN CHECK</button><pre id='dg' style='white-space:pre-wrap;font-size:12px;margin:10px 0 0'></pre></div>`);
+ if(av=='adv')am.insertAdjacentHTML('beforeend',await advHTML())};
+async function advHTML(){const [E,C]=await Promise.all([sb.from('ad_enquiries').select('*').order('created_at',{ascending:false}).limit(100),sb.from('ad_campaigns').select('*').order('slot').order('starts_at',{ascending:false})]);
+ const now=Date.now(),cs=C.data||[],live=s=>cs.find(c=>c.slot==s&&c.is_active&&new Date(c.starts_at)<=now&&new Date(c.ends_at)>now),en=(E.data||[]).filter(x=>afil=='all'||x.status==afil),opt=a=>a.map(x=>`<option>${x}</option>`).join('');
+ return `<h3>Ad slots</h3>${[1,2,3].map(s=>`<div class='ar'><span>Slot ${s}${s==1?' (wide, 50%)':' (25%)'}<br><small>${live(s)?H(live(s).advertiser_name||'Poster')+' &middot; ends '+new Date(live(s).ends_at).toLocaleDateString():'Showing YOUR AD HERE'}</small></span></div>`).join('')}
+<h3>Create campaign</h3><form id='fc' class='glass' style='display:grid;gap:10px;max-width:560px'><select class='ai sel' name='slot'><option value='1'>Slot 1 - wide banner (2100 x 600 px, 7:2)</option><option value='2'>Slot 2 - card (1200 x 900 px, 4:3)</option><option value='3'>Slot 3 - card (1200 x 900 px, 4:3)</option></select><input class='ai' name='adv' placeholder='Advertiser name (private, never shown on the site)' maxlength='80'><input class='ai' name='url' type='url' placeholder='Link when the poster is clicked (optional)'><label>Starts <input class='ai' name='st' type='datetime-local' required></label><label>Ends <input class='ai' name='en' type='datetime-local' required></label><label>Poster: image up to 10 MB or video up to 5 seconds <input name='file' type='file' accept='image/png,image/jpeg,image/webp,video/mp4,video/webm' required></label><label><input type='checkbox' name='on'> Publish immediately</label><button class='btn'>CREATE CAMPAIGN</button></form>
+<h3>Campaigns</h3>${cs.map(c=>`<div class='ar'><span>Slot ${c.slot}: ${H(c.advertiser_name||'Poster')} <small>${new Date(c.starts_at).toLocaleDateString()} to ${new Date(c.ends_at).toLocaleDateString()} &middot; ${c.is_active?(new Date(c.ends_at)<now?'expired':'published'):'unpublished'} &middot; ${c.impressions} views, ${c.clicks} clicks</small></span><span><button data-ad='tg' data-id='${c.id}' data-v='${c.is_active}'>${c.is_active?'Unpublish':'Publish'}</button><button data-ad='ed' data-id='${c.id}' data-h='${H(c.advertiser_name||'')}' data-u='${H(c.destination_url)}'>Edit</button><button data-ad='rm' data-id='${c.id}'>Remove</button></span></div>`).join('')||`<p class='sub'>None yet.</p>`}
+<h3>Enquiries</h3><label>Status <select class='ai sel' id='afl' style='width:auto'>${['all','new','pending','approved','rejected'].map(s=>`<option ${s==afil?'selected':''}>${s}</option>`).join('')}</select></label>${en.map(x=>`<details class='ar' style='display:block'><summary>${H(x.brand)} &middot; ${H(x.reference)} &middot; Slot ${x.slot||'?'} &middot; ${x.status} &middot; ${money(x.budget_inr)} / ${H(x.duration)}</summary><p>${H(x.contact_name)} &middot; <a href='mailto:${H(x.email)}' style='color:var(--red)'>${H(x.email)}</a>${x.website?' &middot; '+H(x.website):''}<br><small>${new Date(x.created_at).toLocaleString()}</small></p><p><b>Ad:</b> ${H(x.description)}</p>${x.message?`<p><b>Message:</b> ${H(x.message)}</p>`:''}${x.image_path?`<button data-ad='img' data-id='${x.id}' data-p='${H(x.image_path)}'>Preview image</button><div id='pv-${x.id}'></div>`:''}<p style='margin-top:10px'>${['pending','approved','rejected'].map(s=>`<button data-ad='st' data-id='${x.id}' data-s='${s}'>${s[0].toUpperCase()+s.slice(1)}</button>`).join('')}</p></details>`).join('')||`<p class='sub'>No enquiries.</p>`}`}
+adm.addEventListener('click',async e=>{const b=e.target.closest('button[data-ad]');if(!b)return;const a=b.dataset.ad,id=b.dataset.id,now=new Date().toISOString();let q;
+ if(a=='st')q=sb.from('ad_enquiries').update({status:b.dataset.s,updated_at:now}).eq('id',id);
+ if(a=='img'){const {data}=await sb.storage.from('ad-enquiries').createSignedUrl(b.dataset.p,300);if(data)document.getElementById('pv-'+id).innerHTML=/[.](mp4|webm)$/i.test(b.dataset.p)?`<video src='${esc(data.signedUrl)}' controls muted style='max-width:320px;border-radius:12px;margin:8px 0'></video>`:`<img src='${esc(data.signedUrl)}' alt='Uploaded creative' style='max-width:260px;border-radius:12px;margin:8px 0'>`;return}
+ if(a=='tg')q=sb.from('ad_campaigns').update({is_active:b.dataset.v!='true',updated_at:now}).eq('id',id);
+ if(a=='ed'){const h=prompt('Advertiser name (private)',b.dataset.h);if(h===null)return;const u=prompt('Link when the poster is clicked (optional)',b.dataset.u||'');if(u&&!/^https?:[/][/]/i.test(u))return toast('Link must start with http:// or https://');const en=prompt('New end date (YYYY-MM-DD), blank to keep');const up={advertiser_name:h||null,destination_url:u||null,updated_at:now};if(en){const d=new Date(en+'T23:59:00');if(isNaN(d))return toast('Invalid date');up.ends_at=d.toISOString()}q=sb.from('ad_campaigns').update(up).eq('id',id)}
+ if(a=='rm'){if(!confirm('Remove this advertisement? Its stats are deleted and the slot goes back to YOUR AD HERE.'))return;q=sb.from('ad_campaigns').delete().eq('id',id)}
+ if(a=='diag'){const {data:{session}}=await sb.auth.getSession();const r=await fetch('/api/donate-diagnose',{headers:{Authorization:'Bearer '+session.access_token}});document.getElementById('dg').textContent=JSON.stringify(await r.json().catch(()=>({error:'No response'})),null,2);return}
+ if(q)act2(q)});
+adm.addEventListener('change',e=>{if(e.target.id=='afl'){afil=e.target.value;render.admin()}});
+adm.addEventListener('submit',async e=>{if(e.target.id!='fc')return;e.preventDefault();const d=new FormData(e.target);const u0=d.get('url');if(u0&&!/^https?:[/][/]/i.test(u0))return toast('Link must start with http:// or https://');
+ const st=new Date(d.get('st')),en=new Date(d.get('en'));if(isNaN(st)||isNaN(en))return toast('Choose a start and an end date.');if(en<=st)return toast('The end date must be after the start date.');
+ try{const u=await upMedia(d.get('file'));if(!u)return toast('Upload the poster.');act2(sb.from('ad_campaigns').insert({slot:+d.get('slot'),advertiser_name:d.get('adv')||null,headline:null,destination_url:u0||null,starts_at:st.toISOString(),ends_at:en.toISOString(),image_url:u,is_active:d.get('on')=='on'}))}catch(_){}});
+
+render.admin();
+</script></body></html>

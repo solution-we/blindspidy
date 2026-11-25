@@ -217,7 +217,6 @@ $('#cf').onsubmit=e=>{e.preventDefault();if($('#hp').value)return;const n=$('#cn
 <script>
 const sb=supabase.createClient('https://mnwajosoystfikvhjdyf.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ud2Fqb3NveXN0ZmlrdmhqZHlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU0MTg4NjYsImV4cCI6MjExMDk5NDg2Nn0.eHwS2FfGka3-yR3cnczAHo5jPx0WO4t8YUDtjW2Uiyg');
 document.head.insertAdjacentHTML('beforeend','<style>.ai{background:rgba(0,0,0,.5);border:1px solid #666;border-radius:12px;padding:10px 12px;width:100%;min-height:44px}.ar{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bd);flex-wrap:wrap}.ar button{border:1px solid #555;background:none;border-radius:10px;padding:8px 12px;cursor:pointer;margin-left:6px}.ar small{color:var(--tx2)}#p-admin h3{margin:32px 0 12px}</style>');
-document.querySelector('main').insertAdjacentHTML('beforeend','<section class="page" id="p-admin"></section>');
 document.querySelector('.note').textContent='Your message goes straight to the Blind Spidy inbox.';
 const rel=iso=>Math.max(0,Math.floor((Date.now()-new Date(iso))/864e5)),H=s=>esc(String(s??''));
 async function sync(){try{
@@ -231,47 +230,6 @@ async function sync(){try{
  REELS.splice(0,REELS.length,...v.data.filter(x=>x.platform=='instagram').map(mv));
  (s.data||[]).forEach(x=>{SOCIAL[x.platform=='youtube'?'yt':'ig']={count:x.count,pending:x.status=='pending'}});
 }catch(e){console.error(e)}document.body.classList.add('ready');route()}
-const act=async q=>{const {error}=await q;if(error)return toast(error.message);toast('Saved');sync()};
-render.admin=async()=>{const el=$('#p-admin');const {data:{session}}=await sb.auth.getSession();
- if(!session){el.innerHTML='<h1 class="it">Admin <s>//</s></h1><form id="fl" style="max-width:380px;display:grid;gap:12px"><input class="ai" name="e" type="email" placeholder="Email" aria-label="Email"><input class="ai" name="p" type="password" placeholder="Password" aria-label="Password"><button class="btn">LOG IN</button></form>';el.onsubmit=async e=>{e.preventDefault();const d=new FormData(e.target);const {error}=await sb.auth.signInWithPassword({email:d.get('e'),password:d.get('p')});error?toast(error.message):render.admin()};return}
- const {data:pr}=await sb.from('profiles').select('role').eq('id',session.user.id).maybeSingle();
- const out='<button class="btn" data-a="out" style="margin-top:8px">LOG OUT</button>';
- if(pr?.role!='admin'){el.innerHTML='<h1 class="it">No access</h1><p class="sub">This account is not an admin.</p>'+out;el.onclick=async()=>{await sb.auth.signOut();sync()};return}
- const [R,V,M]=await Promise.all([sb.from('resources').select('*').order('created_at',{ascending:false}),sb.from('videos').select('*').order('published_at',{ascending:false}),sb.from('contact_messages').select('*').order('created_at',{ascending:false})]);
- const by=Object.fromEntries((R.data||[]).map(x=>[x.id,x])),opt=a=>a.map(x=>`<option>${x}</option>`).join(''),box='class="glass" style="display:grid;gap:10px;max-width:560px"';
- el.innerHTML=`<h1 class="it">Admin <s>//</s></h1>${out}
-<h3>Add resource</h3><form id="fr" ${box}><input class="ai" name="title" placeholder="Title" required maxlength="160"><select class="ai sel" name="section"><option value="links">Links</option><option value="assets">Assets</option></select><select class="ai sel" name="category">${opt(['Games','Tools','Presets','Mods','Resources'])}</select><input class="ai" name="url" type="url" placeholder="External URL (https://…)"><textarea class="ai" name="description" placeholder="Description"></textarea><label>Thumbnail (image, max 2 MB) <input name="file" type="file" accept="image/*"></label><button class="btn">ADD RESOURCE</button></form>
-<h3>Resources (${R.data.length})</h3>${R.data.map(x=>`<div class="ar"><span>${H(x.title)} <small>${x.section} · ${x.views} views${x.visible?'':' · hidden'}</small></span><span><button data-a="rv" data-id="${x.id}" data-v="${x.visible}">${x.visible?'Hide':'Show'}</button><button data-a="re" data-id="${x.id}">Edit</button><button data-a="rd" data-id="${x.id}">Delete</button></span></div>`).join('')||'<p class="sub">None yet.</p>'}
-<h3>Add video or reel (manual)</h3><form id="fv" ${box}><select class="ai sel" name="platform"><option value="youtube">YouTube</option><option value="instagram">Instagram</option></select><select class="ai sel" name="kind">${opt(['video','short','live','reel'])}</select><input class="ai" name="title" placeholder="Title or caption" required><input class="ai" name="url" type="url" placeholder="Original URL" required><input class="ai" name="duration" placeholder="Duration e.g. 8:17"><input class="ai" name="thumb" type="url" placeholder="Thumbnail image URL"><input class="ai" name="views" type="number" min="0" placeholder="Views"><button class="btn">ADD</button></form>
-<h3>Videos (${V.data.length})</h3>${V.data.map(x=>`<div class="ar"><span>${H(x.title)} <small>${x.platform}/${x.kind}${x.visible?'':' · hidden'}</small></span><span><button data-a="vv" data-id="${x.id}" data-v="${x.visible}">${x.visible?'Hide':'Show'}</button><button data-a="vd" data-id="${x.id}">Delete</button></span></div>`).join('')||'<p class="sub">None yet.</p>'}
-<h3>Social counts (manual until sync is connected)</h3><form id="fs" ${box}><label>YouTube subscribers <input class="ai" name="yt" type="number" min="0" value="${SOCIAL.yt.count}"></label><label>Instagram followers <input class="ai" name="ig" type="number" min="0" value="${SOCIAL.ig.count}"></label><button class="btn">SAVE COUNTS</button></form>
-<h3>Messages (${M.data.length})</h3>${M.data.map(x=>`<div class="ar" style="align-items:flex-start;${x.is_read?'opacity:.6':''}"><span style="max-width:640px"><b>${H(x.name)}</b> <a href="mailto:${H(x.email)}" style="color:var(--red)">${H(x.email)}</a> <small>${new Date(x.created_at).toLocaleString()}${x.is_spam?' · SPAM':''}</small><br>${H(x.message)}</span><span><button data-a="mr" data-id="${x.id}" data-v="${x.is_read}">${x.is_read?'Mark unread':'Mark read'}</button><button data-a="ms" data-id="${x.id}" data-v="${x.is_spam}">${x.is_spam?'Not spam':'Spam'}</button><button data-a="md" data-id="${x.id}">Delete</button></span></div>`).join('')||'<p class="sub">No messages yet.</p>'}`;
- el.onclick=async e=>{const b=e.target.closest('button[data-a]');if(!b)return;const a=b.dataset.a,id=b.dataset.id,fl=b.dataset.v!='true';let q;
-  if(a=='out'){await sb.auth.signOut();return sync()}
-  if(a=='rv')q=sb.from('resources').update({visible:fl}).eq('id',id);
-  if(a=='vv')q=sb.from('videos').update({visible:fl}).eq('id',id);
-  if(a=='mr')q=sb.from('contact_messages').update({is_read:fl}).eq('id',id);
-  if(a=='ms')q=sb.from('contact_messages').update({is_spam:fl}).eq('id',id);
-  if(a=='rd'||a=='vd'||a=='md'){if(!confirm('Delete permanently?'))return;q=sb.from({rd:'resources',vd:'videos',md:'contact_messages'}[a]).delete().eq('id',id)}
-  if(a=='re'){const x=by[id],t=prompt('Title',x.title);if(!t)return;const u=prompt('External URL',x.external_url||'');q=sb.from('resources').update({title:t,external_url:u||null,updated_at:new Date().toISOString()}).eq('id',id)}
-  if(q)act(q)};
- el.onsubmit=async e=>{e.preventDefault();const f=e.target.id,d=new FormData(e.target);
-  if(f=='fr'){let th=null;const file=d.get('file');
-   if(file&&file.size){if(!file.type.startsWith('image/')||file.size>2e6)return toast('Thumbnail must be an image under 2 MB.');const path=Date.now()+'-'+file.name.replace(/[^\w.]/g,'_');const up=await sb.storage.from('thumbnails').upload(path,file);if(up.error)return toast(up.error.message);th=sb.storage.from('thumbnails').getPublicUrl(path).data.publicUrl}
-   act(sb.from('resources').insert({title:d.get('title'),section:d.get('section'),category:d.get('category'),external_url:d.get('url')||null,description:d.get('description')||null,thumbnail_url:th}))}
-  if(f=='fv')act(sb.from('videos').insert({platform:d.get('platform'),kind:d.get('kind'),title:d.get('title'),url:d.get('url'),duration:d.get('duration')||null,thumbnail_url:d.get('thumb')||null,view_count:+d.get('views')||0,manual:true}));
-  if(f=='fs'){for(const [p,k] of [['youtube','yt'],['instagram','ig']]){const {error}=await sb.from('social_stats').update({count:+d.get(k)||0,manual:true,status:'manual',last_synced_at:new Date().toISOString()}).eq('platform',p);if(error)return toast(error.message)}toast('Saved');sync()}};
-};
-$('#cf').onsubmit=async e=>{e.preventDefault();if($('#hp').value)return;const n=$('#cn').value.trim(),m=$('#ce').value.trim(),msg=$('#cm').value.trim();let ok=true;
- const chk=(k,bad,t)=>{setE(k,bad?t:'');if(bad)ok=false};
- chk('cn',n.length<2,'Enter your name.');chk('ce',!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(m),'Enter a valid email address.');chk('cm',msg.length<10,'Message must be at least 10 characters.');chk('ct',!$('#ct').checked,'Accept the Terms of Service to continue.');
- if(!ok)return;const b=e.target.querySelector('.btn');b.disabled=true;b.textContent='SENDING…';
- let error;try{const r=await fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,email:m,message:msg,website:$('#hp').value})});if(!r.ok)error=1}catch(_){error=1}
- b.disabled=false;b.textContent='SUBMIT →';
- if(error)return toast('Could not send your message. Please email blindspidy2@gmail.com instead.');
- e.target.reset();toast('Message sent. Thank you!')};
-sync();
-RES.length=ASSETS.length=VID.length=REELS.length=0;
 </script>
 <script>
 const YT='https://youtube.com/@blindspidey',IG='https://www.instagram.com/blindspidy';
@@ -283,14 +241,6 @@ body:not(.ready) main{visibility:hidden}
 .pill{gap:0;border-radius:40px}.pill button{border-radius:40px;padding:14px 38px;font-size:18px;min-height:60px;border-width:1.5px}.tabs button,.tabs{border-radius:40px}.tabs button{padding:12px 34px;font-size:17px}
 #stats .glass{cursor:pointer}
 @media(max-width:899px){.meta{font-size:11px}.cb{padding:10px}.vh{flex-direction:column}#plat{width:100%}#plat button{flex:1;justify-content:center;padding:12px 8px;font-size:16px;min-height:52px}.tabs{overflow-x:auto}}
-body.adm #side,body.adm header.top,body.adm .desk-logo{display:none!important}body.adm main{margin:0;padding:0;max-width:none}body.adm::after{display:none}
-.ad{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:100vh}.as{border-right:1px solid var(--bd);padding:22px 14px;display:flex;flex-direction:column;gap:6px;position:sticky;top:0;height:100vh}
-.as .n{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:12px;border:1px solid transparent;background:none;cursor:pointer;text-align:left;width:100%}.as .n.on{background:linear-gradient(90deg,#8d0f1d,#3a0509);border-color:var(--red2)}.as .n b{margin-left:auto;background:var(--red);border-radius:8px;padding:0 7px;font-size:12px}
-.am{padding:24px 28px}.sg{display:grid;gap:14px;grid-template-columns:repeat(5,minmax(0,1fr));margin:20px 0}.sc{display:flex;gap:12px;align-items:center;padding:16px}.sc i{width:48px;height:48px;border-radius:12px;background:rgba(255,16,43,.25);border:1px solid var(--red2);display:grid;place-items:center;flex:none}.sc small{display:block;color:var(--tx2);font-size:13px}.sc strong{font-size:24px}
-.ag{display:grid;gap:16px;grid-template-columns:minmax(0,2fr) minmax(0,1fr);margin-bottom:16px}.ag3{display:grid;gap:16px;grid-template-columns:repeat(3,minmax(0,1fr))}.ag h3,.am h3{margin:0 0 12px}
-.ok{background:rgba(0,200,90,.15);color:#3be07f;border-radius:8px;padding:2px 10px;font-size:13px}.qa{display:grid;grid-template-columns:1fr 1fr;gap:10px}.qa button{border:1px solid #444;background:none;border-radius:14px;padding:16px 8px;cursor:pointer;display:grid;gap:6px;justify-items:center}
-@media(max-width:1100px){.sg{grid-template-columns:repeat(2,minmax(0,1fr))}.ag,.ag3{grid-template-columns:1fr}}
-@media(max-width:800px){.ad{grid-template-columns:1fr}.as{position:static;height:auto;flex-direction:row;flex-wrap:wrap;border-right:0;border-bottom:1px solid var(--bd)}.as .n{width:auto}.am{padding:18px 14px}}
 </style>`);
 $('#stats').addEventListener('click',e=>{const g=e.target.closest('.glass');if(g)window.open(g.classList.contains('ig')?IG:YT,'_blank','noopener')});
 addEventListener('hashchange',()=>document.body.classList.toggle('adm',location.hash=='#admin'));
@@ -298,51 +248,6 @@ if(location.hash=='#admin')document.body.classList.add('adm');
 if(!sessionStorage.sv&&location.hash!='#admin'){sessionStorage.sv=1;sb.from('site_visits').insert({path:location.hash||'#home'}).then(()=>{})}
 const ic=p=>`<svg class='ic' viewBox='0 0 24 24'>${p}</svg>`;
 const P={home:'<path d="M3 11l9-8 9 8M5 10v10h14V10"/>',layers:'<path d="M12 3l9 5-9 5-9-5zM3 13l9 5 9-5"/>',img:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/>',play:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9l5 3-5 3z"/>',mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',users:'<circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-4 3-6 7-6s7 2 7 6M16 4a3.5 3.5 0 0 1 0 7M18 14c2.5.5 4 2.5 4 6"/>',eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',ext:'<path d="M14 4h6v6M20 4l-9 9M18 14v6H4V6h6"/>',sync:'<path d="M20 11a8 8 0 0 0-14-4M4 4v4h4M4 13a8 8 0 0 0 14 4M20 20v-4h-4"/>',plus:'<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>'};
-const NAVA=[['dash','Dashboard','home'],['res','Resources','layers'],['ast','Assets','img'],['vid','Videos','play'],['msg','Messages','mail'],['soc','Social Stats','users']];
-let av='dash';
-const when=iso=>{const d=rel(iso);return d?ago(d):'today'};
-render.admin=async()=>{const el=$('#p-admin');document.body.classList.add('adm');const {data:{session}}=await sb.auth.getSession();
- if(!session){el.innerHTML=`<div class='am'><h1 class='it'>Admin <s>//</s></h1><form id='fl' style='max-width:380px;display:grid;gap:12px'><input class='ai' name='e' type='email' placeholder='Email' aria-label='Email'><input class='ai' name='p' type='password' placeholder='Password' aria-label='Password'><button class='btn'>LOG IN</button></form></div>`;el.onclick=null;el.onsubmit=async e=>{e.preventDefault();const d=new FormData(e.target);const {error}=await sb.auth.signInWithPassword({email:d.get('e'),password:d.get('p')});error?toast(error.message):render.admin()};return}
- const {data:pr}=await sb.from('profiles').select('role').eq('id',session.user.id).maybeSingle();
- if(pr?.role!='admin'){el.innerHTML=`<div class='am'><h1 class='it'>No access</h1><p class='sub'>This account is not an admin.</p><button class='btn' data-a='out'>LOG OUT</button></div>`;el.onclick=async()=>{await sb.auth.signOut();sync()};return}
- const since=new Date(Date.now()-30*864e5).toISOString();
- const [R,V,M,S,T,TC]=await Promise.all([sb.from('resources').select('*').order('created_at',{ascending:false}),sb.from('videos').select('*').order('published_at',{ascending:false}),sb.from('contact_messages').select('*').order('created_at',{ascending:false}),sb.from('social_stats').select('*'),sb.from('site_visits').select('visited_at').gte('visited_at',since).limit(5000),sb.from('site_visits').select('*',{count:'exact',head:true})]);
- const rs=R.data||[],vs=V.data||[],ms=M.data||[],ss=Object.fromEntries((S.data||[]).map(x=>[x.platform,x])),unread=ms.filter(x=>!x.is_read&&!x.is_spam).length,by=Object.fromEntries(rs.map(x=>[x.id,x]));
- const opt=a=>a.map(x=>`<option>${x}</option>`).join(''),box=`class='glass' style='display:grid;gap:10px;max-width:560px'`;
- const stat=(i,l,n)=>`<div class='glass sc'><i>${ic(P[i])}</i><div><small>${l}</small><strong>${n}</strong></div></div>`;
- const rrow=x=>`<div class='ar'><span>${H(x.title)} <small>${x.section} · ${x.category} · ${x.views} views${x.visible?'':' · hidden'}</small></span><span><button data-a='rv' data-id='${x.id}' data-v='${x.visible}'>${x.visible?'Hide':'Show'}</button><button data-a='re' data-id='${x.id}'>Edit</button><button data-a='rd' data-id='${x.id}'>Delete</button></span></div>`;
- const rform=sec=>`<form id='fr' ${box}><input type='hidden' name='section' value='${sec}'><input class='ai' name='title' placeholder='Title' required maxlength='160'><select class='ai sel' name='category'>${opt(['Games','Tools','Presets','Mods','Resources'])}</select><input class='ai' name='url' type='url' placeholder='External URL (https://...)'><textarea class='ai' name='description' placeholder='Description'></textarea><label>Thumbnail (image, max 2 MB) <input name='file' type='file' accept='image/*'></label><button class='btn'>ADD</button></form>`;
- const msgrow=x=>`<div class='ar' style='align-items:flex-start;${x.is_read?'opacity:.6':''}'><span style='max-width:640px'><b>${H(x.name)}</b> <a href='mailto:${H(x.email)}' style='color:var(--red)'>${H(x.email)}</a> <small>${when(x.created_at)}${x.is_spam?' · SPAM':''}</small><br>${H(x.message)}</span><span><button data-a='mr' data-id='${x.id}' data-v='${x.is_read}'>${x.is_read?'Unread':'Read'}</button><button data-a='ms' data-id='${x.id}' data-v='${x.is_spam}'>${x.is_spam?'Not spam':'Spam'}</button><button data-a='md' data-id='${x.id}'>Delete</button></span></div>`;
- const syn=(p,n)=>{const s=ss[p];return `<div class='ar'><span>${n}<br><small>${s?.last_synced_at?'Last updated '+when(s.last_synced_at):'Never updated'}</small></span><span class='ok' style='${s&&(s.status=='synced'||s.manual)?'':'background:rgba(255,160,0,.15);color:#ffb020'}'>${s?.status=='synced'?'Synced':s?.manual?'Manual':s?.status=='error'?'Error':'Pending'}</span></div>`};
- let main='';
- if(av=='dash'){const days=[...Array(30)].map((_,i)=>new Date(Date.now()-(29-i)*864e5).toISOString().slice(0,10)),cnt=Object.fromEntries(days.map(d=>[d,0]));(T.data||[]).forEach(x=>{const k=x.visited_at.slice(0,10);if(k in cnt)cnt[k]++});
-  const ys=days.map(d=>cnt[d]),mx=Math.max(...ys,1),line=ys.map((y,i)=>(i?'L':'M')+(i*600/29).toFixed(1)+' '+(170-y/mx*150).toFixed(1)).join('');
-  const chart=`<svg viewBox='0 0 600 190' style='width:100%'><defs><linearGradient id='gr' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='#FF102B' stop-opacity='.5'/><stop offset='1' stop-color='#FF102B' stop-opacity='0'/></linearGradient></defs><path d='${line}L600 170L0 170Z' fill='url(#gr)'/><path d='${line}' fill='none' stroke='#FF102B' stroke-width='2'/><text x='0' y='188' fill='#B7B7B7' font-size='11'>${days[0].slice(5)}</text><text x='600' y='188' fill='#B7B7B7' font-size='11' text-anchor='end'>${days[29].slice(5)}</text><text x='0' y='12' fill='#B7B7B7' font-size='11'>peak ${mx}/day</text></svg>`;
-  main=`<div class='sg'>${stat('eye','Website Visits',(TC.count||0).toLocaleString())}${stat('layers','Total Resources',rs.length)}${stat('play','Total Videos',vs.length)}${stat('play','YouTube Subs',(ss.youtube?.count||0).toLocaleString())}${stat('users','Instagram Followers',(ss.instagram?.count||0).toLocaleString())}</div>
-  <div class='ag'><div class='glass'><h3>Website Traffic (last 30 days)</h3>${chart}</div><div class='glass'><h3>Social Sync Status</h3>${syn('youtube','YouTube')}${syn('instagram','Instagram')}<button class='btn' data-a='sn' style='margin-top:14px;width:100%'>SYNC NOW</button></div></div>
-  <div class='ag3'><div class='glass'><h3>Recent Resources</h3>${rs.slice(0,4).map(x=>`<div class='ar'><span>${H(x.title)}<br><small>${x.category} · ${when(x.created_at)}</small></span><small>${x.views} views</small></div>`).join('')||'<p class=sub>None yet.</p>'}</div><div class='glass'><h3>Recent Messages</h3>${ms.slice(0,4).map(x=>`<div class='ar'><span>${H(x.name)}<br><small>${H(x.message.slice(0,40))}</small></span><small>${when(x.created_at)}</small></div>`).join('')||'<p class=sub>No messages yet.</p>'}</div><div class='glass'><h3>Quick Actions</h3><div class='qa'><button data-go='res'>${ic(P.plus)}Add Resource</button><button data-go='vid'>${ic(P.plus)}Add Video</button><button data-go='ast'>${ic(P.plus)}Add Asset</button><button data-go='soc'>${ic(P.sync)}Sync Accounts</button></div></div></div>`}
- if(av=='res'||av=='ast'){const sec=av=='res'?'links':'assets';main=`<h3>Add ${sec=='links'?'resource':'asset'}</h3>${rform(sec)}<h3>All ${sec}</h3>${rs.filter(x=>x.section==sec).map(rrow).join('')||'<p class=sub>None yet.</p>'}`}
- if(av=='vid')main=`<h3>Add video or reel (manual)</h3><form id='fv' ${box}><select class='ai sel' name='platform'><option value='youtube'>YouTube</option><option value='instagram'>Instagram</option></select><select class='ai sel' name='kind'>${opt(['video','short','live','reel'])}</select><input class='ai' name='title' placeholder='Title or caption' required><input class='ai' name='url' type='url' placeholder='Original URL' required><input class='ai' name='duration' placeholder='Duration e.g. 8:17'><input class='ai' name='thumb' type='url' placeholder='Thumbnail image URL'><input class='ai' name='views' type='number' min='0' placeholder='Views'><button class='btn'>ADD</button></form><h3>Videos (${vs.length})</h3>${vs.map(x=>`<div class='ar'><span>${H(x.title)} <small>${x.platform}/${x.kind}${x.visible?'':' · hidden'}</small></span><span><button data-a='vv' data-id='${x.id}' data-v='${x.visible}'>${x.visible?'Hide':'Show'}</button><button data-a='vd' data-id='${x.id}'>Delete</button></span></div>`).join('')||'<p class=sub>None yet.</p>'}`;
- if(av=='msg')main=`<h3>Messages (${ms.length})</h3>${ms.map(msgrow).join('')||'<p class=sub>No messages yet.</p>'}`;
- if(av=='soc')main=`<h3>Social counts (manual until API sync is connected)</h3><form id='fs' ${box}><label>YouTube subscribers <input class='ai' name='yt' type='number' min='0' value='${ss.youtube?.count||0}'></label><label>Instagram followers <input class='ai' name='ig' type='number' min='0' value='${ss.instagram?.count||0}'></label><button class='btn'>SAVE COUNTS</button></form><h3>Status</h3>${syn('youtube','YouTube')}${syn('instagram','Instagram')}`;
- el.innerHTML=`<div class='ad'><nav class='as'><a class='mark' href='#home' style='font-size:22px;margin-bottom:16px'>Blind <b>Spidy.</b></a>${NAVA.map(([k,l,i])=>`<button class='n${av==k?' on':''}' data-go='${k}'>${ic(P[i])}${l}${k=='msg'&&unread?`<b>${unread}</b>`:''}</button>`).join('')}<a class='n' href='#home' style='margin-top:auto;text-decoration:none;border-color:#444'>${ic(P.ext)}View Website</a><button class='n' data-a='out'>Log out</button></nav><div class='am'><div class='lab' style='font-size:20px'>Admin</div><h1 class='it' style='font-size:40px'>${NAVA.find(n=>n[0]==av)[1]}</h1>${main}</div></div>`;
- el.onclick=async e=>{const g=e.target.closest('[data-go]');if(g){av=g.dataset.go;return render.admin()}const b=e.target.closest('button[data-a]');if(!b)return;const a=b.dataset.a,id=b.dataset.id,fl=b.dataset.v!='true';let q;
-  if(a=='out'){await sb.auth.signOut();return sync()}
-  if(a=='sn'){b.disabled=true;toast('Syncing YouTube...');const {data:{session:s}}=await sb.auth.getSession();try{const r=await fetch('/api/sync-youtube',{method:'POST',headers:{Authorization:'Bearer '+s.access_token}});const j=await r.json();toast(r.ok?'YouTube synced: '+j.videos+' videos':(j.error||'Sync failed'))}catch(_){toast('Sync failed')}b.disabled=false;return sync()}
-  if(a=='rv')q=sb.from('resources').update({visible:fl}).eq('id',id);
-  if(a=='vv')q=sb.from('videos').update({visible:fl}).eq('id',id);
-  if(a=='mr')q=sb.from('contact_messages').update({is_read:fl}).eq('id',id);
-  if(a=='ms')q=sb.from('contact_messages').update({is_spam:fl}).eq('id',id);
-  if(a=='rd'||a=='vd'||a=='md'){if(!confirm('Delete permanently?'))return;q=sb.from({rd:'resources',vd:'videos',md:'contact_messages'}[a]).delete().eq('id',id)}
-  if(a=='re'){const x=by[id],t=prompt('Title',x.title);if(!t)return;const u=prompt('External URL',x.external_url||'');q=sb.from('resources').update({title:t,external_url:u||null,updated_at:new Date().toISOString()}).eq('id',id)}
-  if(q)act(q)};
- el.onsubmit=async e=>{e.preventDefault();const f=e.target.id,d=new FormData(e.target);
-  if(f=='fr'){let th=null;const file=d.get('file');
-   if(file&&file.size){if(!file.type.startsWith('image/')||file.size>2e6)return toast('Thumbnail must be an image under 2 MB.');const path=Date.now()+'-'+file.name.replace(/[^a-z0-9.]/gi,'_');const up=await sb.storage.from('thumbnails').upload(path,file);if(up.error)return toast(up.error.message);th=sb.storage.from('thumbnails').getPublicUrl(path).data.publicUrl}
-   act(sb.from('resources').insert({title:d.get('title'),section:d.get('section'),category:d.get('category'),external_url:d.get('url')||null,description:d.get('description')||null,thumbnail_url:th}))}
-  if(f=='fv')act(sb.from('videos').insert({platform:d.get('platform'),kind:d.get('kind'),title:d.get('title'),url:d.get('url'),duration:d.get('duration')||null,thumbnail_url:d.get('thumb')||null,view_count:+d.get('views')||0,manual:true}));
-  if(f=='fs'){for(const [p,k] of [['youtube','yt'],['instagram','ig']]){const {error}=await sb.from('social_stats').update({count:+d.get(k)||0,manual:true,status:'manual',last_synced_at:new Date().toISOString()}).eq('platform',p);if(error)return toast(error.message)}toast('Saved');sync()}};
-};
 </script>
 <script>
 /* Background layer rebuilt from the reference screenshots */
@@ -485,40 +390,6 @@ async function allPage(first){if(first){allN=0;$('#dmb').innerHTML=`<h2 class='i
  $('#all').insertAdjacentHTML('beforeend',d.map(lrow).join('')||(first?`<p class='sub'>No supporters yet.</p>`:''));$('#more').style.display=d.length==20?'inline-block':'none'}
 addEventListener('hashchange',()=>{if((location.hash.slice(1)||'home')=='home')loadDon()});
 loadDon();
-/* ---- Admin: Goals and Donations views ---- */
-NAVA.push(['gol','Goals','img'],['don','Donations','mail']);
-const baseAdmin=render.admin;let dfil='all';
-const upImg=async f=>{if(!f||!f.size)return null;if(!f.type.startsWith('image/')||f.size>2e6){toast('Image must be under 2 MB.');throw 0}const p='goals/'+Date.now()+'-'+f.name.replace(/[^a-z0-9.]/gi,'_');const u=await sb.storage.from('thumbnails').upload(p,f);if(u.error){toast(u.error.message);throw 0}return sb.storage.from('thumbnails').getPublicUrl(p).data.publicUrl};
-const st2=(i,l,n)=>`<div class='glass sc'><i>${ic(P[i])}</i><div><small>${l}</small><strong>${n}</strong></div></div>`;
-render.admin=async()=>{await baseAdmin();if(av!='gol'&&av!='don')return;const am=document.querySelector('#p-admin .ad .am');if(!am)return;am.insertAdjacentHTML('beforeend',av=='gol'?await goalsHTML():await donHTML())};
-async function goalsHTML(){const [g,d]=await Promise.all([sb.from('fundraising_goals').select('*').order('display_order'),sb.from('donations').select('goal_id,confirmed_amount').eq('payment_status','success')]);
- const tot={};(d.data||[]).forEach(x=>tot[x.goal_id]=(tot[x.goal_id]||0)+Number(x.confirmed_amount));
- return `<h3>Add goal</h3><form id='fg' class='glass' style='display:grid;gap:10px;max-width:560px'><input class='ai' name='title' placeholder='Title (e.g. Buy Me a PS5)' required maxlength='80'><textarea class='ai' name='description' placeholder='Short description' maxlength='200'></textarea><input class='ai' name='target' type='number' min='1' step='1' placeholder='Target amount (INR)' required><input class='ai' name='ord' type='number' placeholder='Display order (0 first)'><input class='ai' name='alt' placeholder='Image alt text (optional)'><label>Photo (max 2 MB) <input name='file' type='file' accept='image/*'></label><label>Image focus, horizontal <input name='px' type='range' min='0' max='100' value='50'></label><label>Image focus, vertical <input name='py' type='range' min='0' max='100' value='50'></label><label><input type='checkbox' name='pub'> Publish immediately</label><button class='btn'>ADD GOAL</button></form><h3>Goals</h3>${(g.data||[]).map(x=>`<div class='ar'><span>${H(x.title)} <small>${money(tot[x.id]||0)} / ${money(x.target_amount)} &middot; order ${x.display_order} &middot; ${x.is_active?'active':'inactive'} &middot; ${x.is_published?'published':'draft'}${x.is_completed?' &middot; completed':''}</small></span><span><button data-g='act' data-id='${x.id}' data-v='${x.is_active}'>${x.is_active?'Deactivate':'Activate'}</button><button data-g='pub' data-id='${x.id}' data-v='${x.is_published}'>${x.is_published?'Unpublish':'Publish'}</button><button data-g='done' data-id='${x.id}' data-v='${x.is_completed}'>${x.is_completed?'Reopen':'Mark completed'}</button><button data-g='edit' data-id='${x.id}' data-t='${H(x.title)}' data-tg='${x.target_amount}' data-o='${x.display_order}' data-p='${H(x.image_position)}'>Edit</button><label>Change image<input type='file' accept='image/*' data-g='img' data-id='${x.id}' hidden></label></span></div>`).join('')||`<p class='sub'>No goals yet.</p>`}`}
-async function donHTML(){let q=sb.from('donations').select('*,donors(private_name,normalized_email),fundraising_goals(title)').order('created_at',{ascending:false}).limit(100);if(dfil!='all')q=q.eq('payment_status',dfil);
- const [D,E,S,A]=await Promise.all([q,sb.from('payment_events').select('*').order('received_at',{ascending:false}).limit(8),sb.from('site_settings').select('key,value'),sb.from('donations').select('confirmed_amount,donors(id,private_name,public_display_name,name_hidden,avatar_url)').eq('payment_status','success')]);
- const st=Object.fromEntries((S.data||[]).map(x=>[x.key,x.value])),ok=A.data||[],tot={};
- ok.forEach(x=>{const d=x.donors;if(!d)return;(tot[d.id]=tot[d.id]||{d,t:0}).t+=Number(x.confirmed_amount)});
- const top=Object.values(tot).sort((a,b)=>b.t-a.t).slice(0,10),sum=ok.reduce((s,x)=>s+Number(x.confirmed_amount),0);
- return `<div class='sg' style='grid-template-columns:repeat(3,minmax(0,1fr))'>${st2('eye','Verified total',money(sum))}${st2('users','Supporters',Object.keys(tot).length)}${st2('layers','Verified donations',ok.length)}</div>
-<h3>Donation settings</h3><form id='fst' class='glass' style='display:grid;gap:10px;max-width:560px'><label>Minimum amount (INR) <input class='ai' name='min' type='number' min='1' value='${st.donation_min||10}'></label><label>Maximum amount (INR) <input class='ai' name='max' type='number' min='1' value='${st.donation_max||10000}'></label><label>Suggested amounts (comma separated) <input class='ai' name='amts' value='${(st.donation_amounts||[49,99,199,499]).join(', ')}'></label><label>Leaderboard rows on homepage <input class='ai' name='lim' type='number' min='1' max='20' value='${st.leaderboard_limit||5}'></label><button class='btn'>SAVE SETTINGS</button></form>
-<h3>Leaderboard moderation</h3>${top.map(x=>`<div class='ar'><span>${H(x.d.public_display_name||'(no public name)')} <small>${H(x.d.private_name)} &middot; ${money(x.t)}${x.d.name_hidden?' &middot; name hidden':''}</small></span><span><button data-g='hn' data-id='${x.d.id}' data-v='${x.d.name_hidden}'>${x.d.name_hidden?'Show name':'Hide name'}</button>${x.d.avatar_url?`<button data-g='av' data-id='${x.d.id}'>Remove avatar</button>`:''}</span></div>`).join('')||`<p class='sub'>No supporters yet.</p>`}
-<h3>Donations</h3><label>Status <select class='ai sel' id='dfl' style='width:auto'>${['all','success','pending','expired','failed'].map(s=>`<option ${s==dfil?'selected':''}>${s}</option>`).join('')}</select></label>${(D.data||[]).map(x=>`<div class='ar'><span>${H(x.donors?.private_name)} <small>${H(x.donors?.normalized_email)} &middot; ${H(x.fundraising_goals?.title)} &middot; ${money(x.confirmed_amount||x.requested_amount)} &middot; ${x.payment_status}<br>${H(x.famgateway_order_id)} &middot; UTR ${H(x.utr||'-')} &middot; TXN ${H(x.transaction_id||'-')} &middot; ${new Date(x.created_at).toLocaleString()}</small></span></div>`).join('')||`<p class='sub'>None.</p>`}
-<h3>Latest payment events</h3>${(E.data||[]).map(x=>`<div class='ar'><span>${H(x.event_type)} &middot; ${H(x.order_id||'-')} <small>${x.signature_verified?'signature ok':'BAD SIGNATURE'} &middot; ${H(x.processing_status||'')} &middot; ${new Date(x.received_at).toLocaleString()}</small></span></div>`).join('')||`<p class='sub'>None.</p>`}`}
-const adm=$('#p-admin');
-adm.addEventListener('click',e=>{const b=e.target.closest('button[data-g]');if(!b)return;const a=b.dataset.g,id=b.dataset.id,fl=b.dataset.v!='true',T='fundraising_goals',now=new Date().toISOString();let q;
- if(a=='act')q=sb.from(T).update({is_active:fl,updated_at:now}).eq('id',id);
- if(a=='pub')q=sb.from(T).update({is_published:fl,updated_at:now}).eq('id',id);
- if(a=='done')q=sb.from(T).update({is_completed:fl,updated_at:now}).eq('id',id);
- if(a=='edit'){const t=prompt('Title',b.dataset.t);if(!t)return;const tg=+prompt('Target amount (INR)',b.dataset.tg);if(!(tg>0))return;const o=parseInt(prompt('Display order (lower shows first)',b.dataset.o),10)||0;const ps=prompt('Image focus, e.g. 50% 30%',b.dataset.p)||'50% 50%';q=sb.from(T).update({title:t,target_amount:tg,display_order:o,image_position:ps,updated_at:now}).eq('id',id)}
- if(a=='hn')q=sb.from('donors').update({name_hidden:fl,updated_at:now}).eq('id',id);
- if(a=='av')q=sb.from('donors').update({avatar_url:null,updated_at:now}).eq('id',id);
- if(q)act(q)});
-adm.addEventListener('change',async e=>{const t=e.target;
- if(t.dataset.g=='img'){try{const u=await upImg(t.files[0]);if(u)act(sb.from('fundraising_goals').update({image_url:u,updated_at:new Date().toISOString()}).eq('id',t.dataset.id))}catch(_){}}
- if(t.id=='dfl'){dfil=t.value;render.admin()}});
-adm.addEventListener('submit',async e=>{const f=e.target;if(f.id!='fg'&&f.id!='fst')return;e.preventDefault();const d=new FormData(f);
- if(f.id=='fg'){try{const u=await upImg(d.get('file'));act(sb.from('fundraising_goals').insert({title:d.get('title'),description:d.get('description')||null,target_amount:+d.get('target'),image_url:u,image_alt:d.get('alt')||null,image_position:d.get('px')+'% '+d.get('py')+'%',is_published:d.get('pub')=='on',display_order:+d.get('ord')||0}))}catch(_){}}
- if(f.id=='fst'){const am=String(d.get('amts')).split(',').map(x=>+x.trim()).filter(x=>x>0);act(sb.from('site_settings').upsert([{key:'donation_min',value:+d.get('min')},{key:'donation_max',value:+d.get('max')},{key:'donation_amounts',value:am},{key:'leaderboard_limit',value:+d.get('lim')}]))}});
 </script>
 <script>
 /* Ads, medals, mobile fixes, payment resume, cursor */
@@ -586,30 +457,6 @@ async function resume(){let s=null;try{s=JSON.parse(localStorage.getItem('bs_pay
  try{const r=await fetch('/api/donate-status?order_id='+encodeURIComponent(s.o)+'&token='+encodeURIComponent(s.t));if(!r.ok)return clr();const j=await r.json();DN.goal={id:j.goal_id,title:j.goal_title};
   if(j.status=='pending'&&j.qr_url){DN.order={order_id:s.o,access_token:s.t,qr_url:j.qr_url,checkout_url:j.checkout_url,upi_intent:j.upi_intent,payable_amount:j.payable_amount,expires_at:j.expires_at};dm.classList.add('on');payScreen()}
   else if(j.status=='success'){clr();dm.classList.add('on');done(j)}else clr()}catch(_){}}
-resume();
-/* Admin: Advertising view + payment diagnostics */
-NAVA.push(['adv','Advertising','layers']);const adminPrev=render.admin;let afil='all';
-const act2=async q=>{const {error}=await q;if(error)return toast(/overlap|exclusion|conflict/i.test(error.message)?'That slot already has an active campaign in this period.':error.message);toast('Saved');sync()};
-render.admin=async()=>{await adminPrev();const am=document.querySelector('#p-admin .ad .am');if(!am)return;
- if(av=='don')am.insertAdjacentHTML('beforeend',`<h3>Payment diagnostics</h3><div class='glass' style='max-width:620px'><button class='btn' data-ad='diag'>RUN CHECK</button><pre id='dg' style='white-space:pre-wrap;font-size:12px;margin:10px 0 0'></pre></div>`);
- if(av=='adv')am.insertAdjacentHTML('beforeend',await advHTML())};
-async function advHTML(){const [E,C]=await Promise.all([sb.from('ad_enquiries').select('*').order('created_at',{ascending:false}).limit(100),sb.from('ad_campaigns').select('*').order('slot').order('starts_at',{ascending:false})]);
- const now=Date.now(),cs=C.data||[],live=s=>cs.find(c=>c.slot==s&&c.is_active&&new Date(c.starts_at)<=now&&new Date(c.ends_at)>now),en=(E.data||[]).filter(x=>afil=='all'||x.status==afil),opt=a=>a.map(x=>`<option>${x}</option>`).join('');
- return `<h3>Ad slots</h3>${[1,2,3].map(s=>`<div class='ar'><span>Slot ${s}${s==1?' (wide, 50%)':' (25%)'}<br><small>${live(s)?H(live(s).headline)+' &middot; ends '+new Date(live(s).ends_at).toLocaleDateString():'Showing YOUR AD HERE'}</small></span></div>`).join('')}
-<h3>Create campaign</h3><form id='fc' class='glass' style='display:grid;gap:10px;max-width:560px'><select class='ai sel' name='slot'><option value='1'>Slot 1 (wide)</option><option value='2'>Slot 2</option><option value='3'>Slot 3</option></select><input class='ai' name='adv' placeholder='Advertiser name' required maxlength='80'><input class='ai' name='hl' placeholder='Promotional headline' required maxlength='60'><textarea class='ai' name='ds' placeholder='Short description (shown on the wide slot)' maxlength='140'></textarea><input class='ai' name='url' type='url' placeholder='Destination URL (https://...)' required><label>Starts <input class='ai' name='st' type='datetime-local' required></label><label>Ends <input class='ai' name='en' type='datetime-local' required></label><label>Creative: 1980x1080 px recommended (min 1280x720), image up to 10 MB or video up to 5 seconds <input name='file' type='file' accept='image/png,image/jpeg,image/webp,video/mp4,video/webm'></label><label>Image focus, horizontal <input name='px' type='range' min='0' max='100' value='50'></label><label>Image focus, vertical <input name='py' type='range' min='0' max='100' value='50'></label><label><input type='checkbox' name='on'> Publish immediately</label><button class='btn'>CREATE CAMPAIGN</button></form>
-<h3>Campaigns</h3>${cs.map(c=>`<div class='ar'><span>Slot ${c.slot}: ${H(c.headline)} <small>${H(c.advertiser_name)} &middot; ${new Date(c.starts_at).toLocaleDateString()} to ${new Date(c.ends_at).toLocaleDateString()} &middot; ${c.is_active?(new Date(c.ends_at)<now?'expired':'published'):'unpublished'} &middot; ${c.impressions} views, ${c.clicks} clicks</small></span><span><button data-ad='tg' data-id='${c.id}' data-v='${c.is_active}'>${c.is_active?'Unpublish':'Publish'}</button><button data-ad='ed' data-id='${c.id}' data-h='${H(c.headline)}' data-u='${H(c.destination_url)}'>Edit</button><button data-ad='rm' data-id='${c.id}'>Remove</button></span></div>`).join('')||`<p class='sub'>None yet.</p>`}
-<h3>Enquiries</h3><label>Status <select class='ai sel' id='afl' style='width:auto'>${['all','new','pending','approved','rejected'].map(s=>`<option ${s==afil?'selected':''}>${s}</option>`).join('')}</select></label>${en.map(x=>`<details class='ar' style='display:block'><summary>${H(x.brand)} &middot; ${H(x.reference)} &middot; ${x.status} &middot; ${money(x.budget_inr)} / ${H(x.duration)}</summary><p>${H(x.contact_name)} &middot; <a href='mailto:${H(x.email)}' style='color:var(--red)'>${H(x.email)}</a>${x.website?' &middot; '+H(x.website):''}<br><small>${new Date(x.created_at).toLocaleString()}</small></p><p><b>Ad:</b> ${H(x.description)}</p>${x.message?`<p><b>Message:</b> ${H(x.message)}</p>`:''}${x.image_path?`<button data-ad='img' data-id='${x.id}' data-p='${H(x.image_path)}'>Preview image</button><div id='pv-${x.id}'></div>`:''}<p style='margin-top:10px'>${['pending','approved','rejected'].map(s=>`<button data-ad='st' data-id='${x.id}' data-s='${s}'>${s[0].toUpperCase()+s.slice(1)}</button>`).join('')}</p></details>`).join('')||`<p class='sub'>No enquiries.</p>`}`}
-adm.addEventListener('click',async e=>{const b=e.target.closest('button[data-ad]');if(!b)return;const a=b.dataset.ad,id=b.dataset.id,now=new Date().toISOString();let q;
- if(a=='st')q=sb.from('ad_enquiries').update({status:b.dataset.s,updated_at:now}).eq('id',id);
- if(a=='img'){const {data}=await sb.storage.from('ad-enquiries').createSignedUrl(b.dataset.p,300);if(data)document.getElementById('pv-'+id).innerHTML=/[.](mp4|webm)$/i.test(b.dataset.p)?`<video src='${esc(data.signedUrl)}' controls muted style='max-width:320px;border-radius:12px;margin:8px 0'></video>`:`<img src='${esc(data.signedUrl)}' alt='Uploaded creative' style='max-width:260px;border-radius:12px;margin:8px 0'>`;return}
- if(a=='tg')q=sb.from('ad_campaigns').update({is_active:b.dataset.v!='true',updated_at:now}).eq('id',id);
- if(a=='ed'){const h=prompt('Headline',b.dataset.h);if(!h)return;const u=prompt('Destination URL',b.dataset.u);if(!u||!/^https?:[/][/]/i.test(u))return toast('URL must start with http:// or https://');const en=prompt('New end date (YYYY-MM-DD), blank to keep');const up={headline:h,destination_url:u,updated_at:now};if(en){const d=new Date(en+'T23:59:00');if(isNaN(d))return toast('Invalid date');up.ends_at=d.toISOString()}q=sb.from('ad_campaigns').update(up).eq('id',id)}
- if(a=='rm'){if(!confirm('Remove this advertisement? Its stats are deleted and the slot goes back to YOUR AD HERE.'))return;q=sb.from('ad_campaigns').delete().eq('id',id)}
- if(a=='diag'){const {data:{session}}=await sb.auth.getSession();const r=await fetch('/api/donate-diagnose',{headers:{Authorization:'Bearer '+session.access_token}});document.getElementById('dg').textContent=JSON.stringify(await r.json().catch(()=>({error:'No response'})),null,2);return}
- if(q)act2(q)});
-adm.addEventListener('change',e=>{if(e.target.id=='afl'){afil=e.target.value;render.admin()}});
-adm.addEventListener('submit',async e=>{if(e.target.id!='fc')return;e.preventDefault();const d=new FormData(e.target);if(!/^https?:[/][/]/i.test(d.get('url')))return toast('URL must start with http:// or https://');
- try{const u=await upMedia(d.get('file'));act2(sb.from('ad_campaigns').insert({slot:+d.get('slot'),advertiser_name:d.get('adv'),headline:d.get('hl'),description:d.get('ds')||null,destination_url:d.get('url'),starts_at:new Date(d.get('st')).toISOString(),ends_at:new Date(d.get('en')).toISOString(),image_url:u,image_position:d.get('px')+'% '+d.get('py')+'%',is_active:d.get('on')=='on'}))}catch(_){}});
 </script>
 <script>
 /* Ad enquiry redesign, ad media rules, stacked deck */
@@ -735,4 +582,148 @@ function payScreen(){const o=DN.order,m=DN.method||(MOB?'upi':'qr');
  DN.timer=setInterval(()=>{const s=Math.max(0,Math.floor((new Date(o.expires_at)-Date.now())/1000)),t=$('#dtm');if(t)t.textContent=s?`Expires in ${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`:'Session expired'},1000);
  DN.poll=setInterval(()=>poll(false),4000);
  if(m=='upi'&&MOB&&DN.fresh)setTimeout(()=>{location.href=o.upi_intent},200);DN.fresh=false}
+</script>
+<script>
+/* v3: cleaner look, poster-only ads, payment cleanup, avatars, playlists, live counts, mobile menu */
+document.head.insertAdjacentHTML('beforeend',`<style>
+#bg,.bl{display:none!important}
+body::before{background:radial-gradient(55% 45% at 100% 0,rgba(255,16,43,.18),transparent 70%),radial-gradient(50% 40% at 0 100%,rgba(255,16,43,.1),transparent 70%)!important}
+body::after{content:' '!important;position:fixed!important;inset:0!important;left:0!important;bottom:0!important;width:auto!important;height:auto!important;opacity:1!important;clip-path:none!important;pointer-events:none;z-index:0;background:linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px)!important;background-size:56px 56px!important;-webkit-mask-image:radial-gradient(70% 60% at 75% 15%,#000,transparent 80%);mask-image:radial-gradient(70% 60% at 75% 15%,#000,transparent 80%)}
+.card{border:1px solid rgba(255,255,255,.09)!important;border-radius:18px;background:linear-gradient(180deg,#141012,#0b0809);overflow:hidden;transition:transform .25s,border-color .25s,box-shadow .25s}
+.card:hover{transform:translateY(-4px);border-color:rgba(255,16,43,.6)!important;box-shadow:0 14px 34px rgba(0,0,0,.55)}
+.th{overflow:hidden}.th img{transition:transform .5s}.card:hover .th img{transform:scale(1.05)}
+.th::after{content:'';position:absolute;inset:auto 0 0 0;height:45%;background:linear-gradient(0deg,rgba(0,0,0,.6),transparent);pointer-events:none}
+.th .dur,.th .chip{z-index:2}
+.chip{position:absolute;left:10px;top:10px;font:600 11px Inter,sans-serif;text-transform:uppercase;letter-spacing:.06em;padding:4px 10px;border-radius:999px;background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.18)}
+.dur{display:flex;align-items:center;gap:6px}.dur svg{width:13px;height:13px}
+.cb{padding:14px 16px 16px}.ct{font-weight:600;line-height:1.35;min-height:2.7em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.meta{margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.07);font-size:12.5px;color:#9a9a9a;align-items:center}.meta svg{width:15px;height:15px;vertical-align:-3px;margin-right:4px}
+#plat.pill{display:inline-flex;gap:4px;padding:4px;border-radius:999px}
+#plat button{padding:10px 22px!important;min-height:42px!important;height:auto!important;font-size:15px!important;flex:none!important;gap:8px}
+#plat svg{width:20px!important;height:20px!important}
+@media(max-width:899px){#plat.pill{display:flex;width:100%}#plat button{flex:1!important;justify-content:center;padding:10px 8px!important}}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px}
+header.top .mark{flex:0 1 auto;min-width:0;max-width:calc(100% - 66px);clip-path:none;padding-right:0}
+.burger{flex:none;width:46px;height:46px;display:grid;place-content:center;margin:0 0 0 auto;border-radius:12px;border:1px solid #3a1a1f;background:rgba(255,255,255,.04);position:relative;z-index:50;touch-action:manipulation;padding:0}
+.burger i{width:22px;height:2px;margin:3px 0}
+#panel{z-index:60}#panel .pc{position:absolute;top:14px;right:14px;width:46px;height:46px;border-radius:12px;border:1px solid #3a1a1f;background:rgba(255,255,255,.05);font-size:28px;line-height:1;cursor:pointer;display:grid;place-items:center;touch-action:manipulation}
+html.menu-open,html.menu-open body{overflow:hidden}
+.md .x{position:sticky!important;top:0;left:auto!important;right:auto!important;float:right;margin:-6px -6px 0 8px;width:46px;height:46px;z-index:5;touch-action:manipulation;cursor:pointer}
+@media(min-width:1100px){.dr{align-items:stretch}#lb{display:flex;flex-direction:column;height:300px;margin-top:30px;overflow:hidden;background:linear-gradient(145deg,#1d0509,#0a0204)}#lb .lrows{flex:1;overflow:auto;scrollbar-width:none}#lb .lrows::-webkit-scrollbar{display:none}#lb .lf{margin-top:auto}}
+#lb{background:linear-gradient(145deg,#1d0509,#0a0204)}
+.ads{margin:18px 0}
+.ad.s1{aspect-ratio:7/2;min-height:0}.ad.s2,.ad.s3{aspect-ratio:4/3;min-height:0}
+.ad .adgo{display:none}.ad.s1{gap:22px}.ad b.it{font-size:clamp(18px,2.1vw,34px)}
+.ad.act{padding:0;background:#0b0809}.ad.act::before,.ad.act::after{display:none}
+.ad.act img,.ad.act video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+@media(max-width:899px){.ad.s1{aspect-ratio:16/7}.ad.s2,.ad.s3{padding:10px}.ad.s2 .adi svg,.ad.s3 .adi svg{width:34px;height:34px}.ad.s2 b.it,.ad.s3 b.it{font-size:clamp(14px,4.4vw,20px)}.ad.s1 .adi svg{width:44px;height:44px}.ad.s1 small{font-size:12px}}
+.slts{display:flex;gap:10px;flex-wrap:wrap}.slt{flex:1;min-width:150px;text-align:left;padding:12px 14px;border-radius:14px;border:1.5px solid #3a2226;background:rgba(255,255,255,.03);cursor:pointer;color:#fff}.slt small{display:block;color:var(--tx2);font-size:12px}.slt.on{border-color:var(--red);background:linear-gradient(135deg,rgba(255,16,43,.22),rgba(120,0,15,.15))}
+.avu{margin:14px 0;padding:14px;border:1px dashed #5a2a30;border-radius:14px;text-align:center}.avu small{display:block;color:var(--tx2);margin:2px 0 10px}.avb{display:inline-block;border:1px solid var(--red);border-radius:30px;padding:9px 20px;cursor:pointer;font-weight:600}.avb:hover{background:rgba(255,16,43,.15)}#avs{display:block;margin-top:8px;font-size:13px}
+</style>`);
+
+const EYE=`<svg class='ic' viewBox='0 0 24 24'><path d='M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z'/><circle cx='12' cy='12' r='3'/></svg>`;
+const LISTI=`<svg class='ic' viewBox='0 0 24 24'><path d='M4 6h12M4 12h12M4 18h8M19 9v8l-3-2'/></svg>`;
+
+/* ---- mobile menu: close button inside the panel ---- */
+$('#panel').insertAdjacentHTML('afterbegin',`<button class='pc' type='button' aria-label='Close menu'>&times;</button>`);
+$('#panel .pc').onclick=()=>menu(false);
+new MutationObserver(()=>document.documentElement.classList.toggle('menu-open',$('#panel').classList.contains('open'))).observe($('#panel'),{attributes:true,attributeFilter:['class']});
+dm.addEventListener('pointerup',e=>{if(e.target.closest('.x'))closeDon()});
+
+/* ---- gallery cards (Links, Assets, Videos) ---- */
+function gallery(id,data,opts={}){const sel=$('#s-'+id);if(!sel.options.length)sel.innerHTML=Object.entries(SORTS).map(([k,v])=>`<option value="${k}">${v[0]}</option>`).join('');
+ const q=($('#q-'+id)||{value:''}).value.trim().toLowerCase();const list=data().filter(x=>x.t.toLowerCase().includes(q)).sort(SORTS[sel.value][1]);
+ const g=$('#g-'+id);g.innerHTML=list.length?'':`<div class="empty">${opts.empty||'Nothing found.'}</div>`;
+ list.forEach(x=>{const b=document.createElement('button');b.className='card';b.type='button';b.setAttribute('aria-label',x.t);const pl=x.k=='playlist';
+  b.innerHTML=th(x,(x.cat?`<span class='chip'>${H(x.cat)}</span>`:'')+(x.dur?`<span class='dur'>${pl?LISTI:''}${H(x.dur)}</span>`:''))+`<div class='cb'><div class='ct'>${esc(x.t)}</div><div class='meta'>${pl?`<span>Playlist</span>`:`<span>${EYE}${fmt(x.v)}${opts.yt?' views':''}</span>`}<span>${ago(x.d)}</span></div></div>`;
+  b.onclick=()=>open(x);g.append(b)})}
+
+/* ---- Playlists tab ---- */
+$('#tabs').insertAdjacentHTML('beforeend',`<button data-t='playlist'>Playlists</button>`);
+$('#tabs button[data-t=playlist]').onclick=function(){tab='playlist';$$('#tabs button').forEach(x=>x.classList.toggle('on',x==this));render.videos()};
+
+/* ---- leaderboard (rows scroll inside a fixed-height card) ---- */
+function board(){$('#lb').innerHTML=`<div class='lbh'><h3>${ic(TRO)}Top Supporters</h3><button data-lb='1' aria-label='View all supporters'>${ARW}</button></div><div class='lrows'>${LB.map(lrow).join('')||`<p class='sub' style='margin:12px 0'>Be the first supporter.</p>`}</div><div class='lf'>${SUM.supporters} Supporter${SUM.supporters==1?'':'s'} &middot; ${money(SUM.raised)} Raised</div>`}
+board();
+
+/* ---- live subscriber counts ---- */
+async function liveStats(){try{const r=await fetch('/api/live-stats');if(!r.ok)return;const j=await r.json();let ch=false;
+ if(Number.isFinite(j.youtube)&&j.youtube!==SOCIAL.yt.count){SOCIAL.yt.count=j.youtube;ch=true}
+ if(Number.isFinite(j.instagram)&&j.instagram!==SOCIAL.ig.count){SOCIAL.ig.count=j.instagram;ch=true}
+ if(ch&&(location.hash.slice(1)||'home')=='home')stats()}catch(_){}}
+liveStats();setInterval(()=>{if(!document.hidden)liveStats()},90000);
+
+/* ---- payment screen: no order id, no hosted checkout ---- */
+function payScreen(){const o=DN.order,m=DN.method||(MOB?'upi':'qr');
+ $('#dmb').innerHTML=`<div class='pay pq'><h2 class='it'>${m=='upi'?'Pay with your UPI app':'Scan to pay'}</h2><div class='amt'>${money(o.payable_amount)}</div>${m=='upi'?`<a class='btn big' id='upig' href='${esc(o.upi_intent)}'>${ic(PH)}Open UPI app</a><small class='hint'>GPay, PhonePe, Paytm, BHIM and other UPI apps${MOB?'':'. UPI apps open on phones, so scan the QR code on a computer.'}</small>`:`<img src='${esc(o.qr_url)}' alt='UPI QR code' style='margin-top:10px'>`}
+<div class='alt'>${m=='upi'?`<button type='button' id='sqr'>Show QR code instead</button>`:(MOB?`<button type='button' id='sup'>Open UPI app instead</button>`:'')}</div>
+<p class='st'><i></i><span id='dst'>Waiting for payment...</span></p><p id='dtm' style='color:var(--tx2);margin:4px 0 0'></p><p class='priv'>Complete your payment in your UPI app. Your contribution will appear once the payment is verified.</p><button class='btn' id='dck' style='background:none;border:1px solid #555;font-size:14px;min-height:40px;padding:8px 18px'>Check again</button></div>`;
+ clearInterval(DN.timer);clearInterval(DN.poll);
+ DN.timer=setInterval(()=>{const s=Math.max(0,Math.floor((new Date(o.expires_at)-Date.now())/1000)),t=$('#dtm');if(t)t.textContent=s?`Expires in ${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`:'Session expired'},1000);
+ DN.poll=setInterval(()=>poll(false),4000);
+ if(m=='upi'&&MOB&&DN.fresh)setTimeout(()=>{location.href=o.upi_intent},200);DN.fresh=false}
+dm.addEventListener('click',e=>{if(e.target.id=='sup'){DN.method='upi';DN.fresh=true;payScreen()}});
+
+/* ---- thank-you screen with avatar upload ---- */
+async function done(j){clearInterval(DN.timer);clearInterval(DN.poll);const o=DN.order;if(o)DN.sess={o:o.order_id,t:o.access_token};DN.order=null;try{localStorage.removeItem('bs_pay')}catch(_){}
+ await loadDon();const g=GOALS.find(x=>x.id==DN.goal.id);
+ $('#dmb').innerHTML=`<div class='pq'><h2 class='it'>Thank You for Supporting BLIND SPIDY!</h2><div class='amt'>${money(j.amount)}</div><p>Your payment to <b>${H(j.goal_title||DN.goal.title)}</b> is confirmed.</p>${j.lifetime_total?`<p>Your lifetime support: <b>${money(j.lifetime_total)}</b>${j.rank?` &middot; Leaderboard position #${j.rank}`:''}</p>`:''}${g?`<div class='gt' style='margin:14px 0 6px'><b style='width:${pctOf(g)}%'></b></div><small style='color:var(--tx2)'>${money(g.raised)} of ${money(g.target_amount)} raised (${pctOf(g)}%)</small>`:''}${j.can_avatar&&DN.sess?`<div class='avu'><b>Add your avatar</b><small>It appears next to your name on the leaderboard</small><label class='avb'><input type='file' id='avf' accept='image/png,image/jpeg,image/webp' hidden>Choose photo</label><span id='avs'></span></div>`:''}<p class='priv'>Thank you for being a part of the Spidy Squad.</p><button class='btn' id='dcl'>CLOSE</button></div>`}
+dm.addEventListener('change',async e=>{if(e.target.id!='avf')return;const f=e.target.files[0],st=$('#avs');if(!f)return;
+ if(!['image/png','image/jpeg','image/webp'].includes(f.type)||f.size>8e6){st.textContent='Use a JPG, PNG or WebP image under 8 MB.';return}
+ st.textContent='Uploading...';
+ try{const img=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=URL.createObjectURL(f)});
+  const c=document.createElement('canvas');c.width=c.height=256;const x=c.getContext('2d'),s=Math.min(img.width,img.height);x.drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,256,256);
+  const r=await fetch('/api/donor-avatar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({order_id:DN.sess.o,token:DN.sess.t,image:c.toDataURL('image/jpeg',.85)})});const j=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(j.error||'Upload failed');st.textContent='Saved. It will show on the leaderboard.';loadDon()}catch(err){st.textContent=err.message||'Upload failed.'}});
+async function resume(){let s=null;try{s=JSON.parse(localStorage.getItem('bs_pay')||'null')}catch(_){}if(!s)return;const clr=()=>{try{localStorage.removeItem('bs_pay')}catch(_){}};
+ try{const r=await fetch('/api/donate-status?order_id='+encodeURIComponent(s.o)+'&token='+encodeURIComponent(s.t));if(!r.ok)return clr();const j=await r.json();DN.goal={id:j.goal_id,title:j.goal_title};DN.sess=s;
+  if(j.status=='pending'&&j.qr_url){DN.order={order_id:s.o,access_token:s.t,qr_url:j.qr_url,checkout_url:j.checkout_url,upi_intent:j.upi_intent,payable_amount:j.payable_amount,expires_at:j.expires_at};DN.method=DN.method||(MOB?'upi':'qr');dm.classList.add('on');payScreen()}
+  else if(j.status=='success'){clr();dm.classList.add('on');done(j)}else clr()}catch(_){}}
+resume();
+
+/* ---- poster-only ads with per-slot rules ---- */
+const SL={1:{n:'Wide banner',s:'2100 x 600 px',r:3.5,rt:'7:2',min:[1400,400]},2:{n:'Card',s:'1200 x 900 px',r:4/3,rt:'4:3',min:[800,600]},3:{n:'Card',s:'1200 x 900 px',r:4/3,rt:'4:3',min:[800,600]}};
+const AD={slot:1};
+function renderAds(){adsEl.innerHTML=[1,2,3].map(s=>{const a=ADS[s];
+ if(!a)return `<button class='ad s${s}' data-slot='${s}' aria-label='Advertise here'><span class='adi'>${IMGI}</span><span class='adt'><b class='it'>${s==1?'YOUR <em>AD</em> HERE.':'YOUR<br><em>AD</em> HERE.'}</b>${s==1?`<small>Promote your brand, product or service to my audience.</small>`:''}</span></button>`;
+ const media=/[.](mp4|webm)$/i.test(a.image_url||'')?`<video src='${esc(a.image_url)}' autoplay muted loop playsinline preload='metadata'></video>`:`<img src='${esc(a.image_url||'')}' alt='Advertisement' loading='lazy'>`;
+ return a.destination_url?`<a class='ad act s${s}' href='${esc(a.destination_url)}' target='_blank' rel='noopener sponsored' data-id='${a.id}' aria-label='Advertisement'>${media}</a>`:`<div class='ad act s${s}' data-id='${a.id}'>${media}</div>`}).join('');
+ if('IntersectionObserver' in window){const io=new IntersectionObserver(es=>es.forEach(en=>{const id=en.target.dataset.id;if(en.isIntersecting&&id&&!adSeen.has(id)){adSeen.add(id);sessionStorage.adseen=JSON.stringify([...adSeen]);sb.rpc('track_ad',{p_id:id,p_kind:'impression'}).then(()=>{})}}),{threshold:.6});$$('#ads .ad.act').forEach(x=>io.observe(x))}}
+adsEl.addEventListener('click',e=>{const b=e.target.closest('button.ad');if(b)window.__pre=+b.dataset.slot},true);
+const rulesHTML=()=>{const s=SL[AD.slot],r=t=>`<div>${ic(EI.k)}<span>${t}</span></div>`;return `<b>Poster rules for Slot ${AD.slot}</b>${r(`Size <strong>${s.s}</strong> (${s.rt} landscape). Minimum ${s.min[0]} x ${s.min[1]} px.`)}${r(AD.slot==1?'The wide banner is 50% of the row. On phones the edges crop slightly, so keep text in the centre.':'This is a 25% card. Keep logos and text away from the edges.')}${r('Image: PNG, JPG or WebP, up to 10 MB.')}${r('Video: MP4 or WebM, <strong>up to 5 seconds</strong>, up to 10 MB. Plays muted on a loop.')}${r('Your poster is shown exactly as uploaded, so put the brand name, offer and contact inside it.')}${r('Every ad is approved by Nijad before it goes live.')}`};
+const checkPoster=(f,slot)=>new Promise(ok=>{if(!f)return ok('Upload your poster.');const s=SL[slot],im=['image/png','image/jpeg','image/webp'].includes(f.type),vd=['video/mp4','video/webm'].includes(f.type);
+ if(!im&&!vd)return ok('Use a PNG, JPG, WebP, MP4 or WebM file.');if(f.size>10485760)return ok('File must be 10 MB or smaller.');const u=URL.createObjectURL(f);
+ const chk=(w,h)=>{URL.revokeObjectURL(u);if(w<s.min[0]||h<s.min[1])return ok(`Too small (${w} x ${h}). Slot ${slot} needs at least ${s.min[0]} x ${s.min[1]} px.`);if(Math.abs(w/h-s.r)/s.r>.15)return ok(`Wrong shape (${w} x ${h}). Slot ${slot} needs about ${s.rt}, for example ${s.s}.`);ok('')};
+ if(im){const i=new Image();i.onload=()=>chk(i.width,i.height);i.onerror=()=>ok('Could not read this image.');i.src=u}
+ else{const v=document.createElement('video');v.preload='metadata';v.onloadedmetadata=()=>{if(v.duration>5.05){URL.revokeObjectURL(u);return ok('Video must be 5 seconds or shorter.')}chk(v.videoWidth,v.videoHeight)};v.onerror=()=>ok('Could not read this video.');v.src=u}});
+function openAd(pre){pre=pre||window.__pre;window.__pre=0;const free=[1,2,3].filter(s=>!ADS[s]);
+ if(!free.length){$('#dmb').innerHTML=`<div class='pq'><h2 class='it'>All ad slots are booked</h2><p>Every slot has a live campaign right now. Email <b>blindspidy2@gmail.com</b> and I will tell you when one opens up.</p><button class='btn' id='dcl'>CLOSE</button></div>`;dm.classList.add('on');return}
+ AD.slot=free.includes(pre)?pre:free[0];
+ $('#dmb').innerHTML=`<div class='ah'><span class='aic'>${ic(`<path d='M3 11v3l12 5V6zM15 8c3 0 5 1.5 5 4s-2 4-5 4M7 14l1 6h3l-1-5'/>`)}</span><div><h2 class='it'>Advertise With Blind <em>Spidy.</em></h2><p>Your poster, shown on the homepage to my audience.</p></div></div>
+<div class='ag2'><div>${lab('n1','Brand / Company Name',1)}${fld('b','n1','e.g. FNL Studio')}</div><div>${lab('n2','Contact Person',1)}${fld('u','n2','e.g. John Doe')}</div>
+<div>${lab('n3','Email Address',1)}${fld('m','n3','e.g. contact@brand.com','email')}</div><div>${lab('n4','Website / Social Link')}${fld('l','n4','https://yourwebsite.com')}</div>
+<div>${lab('n5','Advertising Budget (INR)',1)}<div class='ef'><span class='rs'>&#8377;</span><input id='n5' type='number' min='1' placeholder='e.g. 5000'></div></div>
+<div>${lab('n6','Preferred Duration',1)}<div class='ef'>${ic(EI.c)}<select id='n6' class='sel'><option value=''>Select duration</option><option>1 week</option><option>2 weeks</option><option>1 month</option><option>3 months</option><option>Other</option></select></div></div>
+<div class='full'>${lab('','Choose your slot (only open slots are shown)',1)}<div class='slts'>${free.map(s=>`<button type='button' class='slt ${s==AD.slot?'on':''}' data-s='${s}'><b>Slot ${s}</b><small>${SL[s].n} &middot; ${SL[s].s}</small></button>`).join('')}</div></div>
+<div class='full'><label class='el'>Your poster <i>*</i></label><div class='ag2'><label class='dz' id='dz'><input type='file' id='af' accept='image/png,image/jpeg,image/webp,video/mp4,video/webm' hidden>${ic(`<path d='M7 18a4 4 0 0 1-.5-8A6 6 0 0 1 18 9a4.5 4.5 0 0 1 0 9M12 12v8M9 15l3-3 3 3'/>`)}<b>Click to upload or drag &amp; drop</b><small>Image or short video poster</small><span id='afn'></span></label><div class='rl' id='rl'>${rulesHTML()}</div></div></div>
+<div>${lab('n7','Ad details (optional)')}<div class='ef'>${ic(EI.f)}<textarea id='n7' maxlength='1500' placeholder='Anything we should know about the campaign...'></textarea></div></div>
+<div>${lab('n8','Message to Nijad (optional)')}<div class='ef'>${ic(EI.q)}<textarea id='n8' maxlength='2000' placeholder='Add a personal message for me...'></textarea></div></div></div>
+<input id='n0' tabindex='-1' autocomplete='off' style='position:absolute;left:-9999px' aria-hidden='true'><div class='er' id='ner' role='alert' style='margin-top:8px'></div>
+<div class='ab'><button type='button' class='cn' id='ncan'>Cancel</button><button type='button' class='sb' id='ago3'>${ic(`<path d='M21 3L3 10l7 3 3 7zM10 13l11-10'/>`)}Submit Enquiry</button></div>`;
+ dm.firstElementChild.classList.add('wide');dm.classList.add('on');
+ const dz=$('#dz'),af=$('#af');af.onchange=()=>{$('#afn').textContent=af.files[0]?af.files[0].name:''};
+ ['dragover','dragenter'].forEach(t=>dz.addEventListener(t,e=>{e.preventDefault();dz.classList.add('on')}));['dragleave','drop'].forEach(t=>dz.addEventListener(t,e=>{e.preventDefault();dz.classList.remove('on')}));
+ dz.addEventListener('drop',e=>{if(e.dataTransfer.files.length){af.files=e.dataTransfer.files;af.onchange()}})}
+dm.addEventListener('click',async e=>{const sl=e.target.closest('.slt');if(sl){AD.slot=+sl.dataset.s;$$('.slt').forEach(x=>x.classList.toggle('on',x==sl));$('#rl').innerHTML=rulesHTML();return}
+ const b=e.target.closest('#ago3');if(!b)return;const er=$('#ner'),v=i=>$('#n'+i).value.trim();const fail=m=>{b.disabled=false;er.textContent=m};
+ if(v(1).length<2)return fail('Enter your brand or company name.');if(v(2).length<2)return fail('Enter the contact person name.');if(!/^[^ @]+@[^ @]+[.][^ @]+$/.test(v(3)))return fail('Enter a valid email address.');
+ if(v(4)&&!/^https?:[/][/]/i.test(v(4)))return fail('Link must start with http:// or https://');if(!(+v(5)>0))return fail('Enter your advertising budget in INR.');if(!v(6))return fail('Select a duration.');
+ const f=$('#af').files[0];b.disabled=true;er.textContent='Checking poster...';const me=await checkPoster(f,AD.slot);if(me)return fail(me);er.textContent='';let path=null;
+ try{const ext={'video/mp4':'mp4','video/webm':'webm','image/png':'png','image/webp':'webp'}[f.type]||'jpg';path=Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.'+ext;
+  const u=await sb.storage.from('ad-enquiries').upload(path,f,{contentType:f.type});if(u.error)return fail('Upload failed. Please try again, or email blindspidy2@gmail.com.');
+  const r=await fetch('/api/ad-enquiry',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({brand:v(1),contact_name:v(2),email:v(3),website:v(4),budget:+v(5),duration:v(6),slot:AD.slot,description:v(7),message:v(8),image_path:path,website_hp:$('#n0').value})});const j=await r.json().catch(()=>({}));
+  if(!r.ok)return fail(j.error||('Could not send your enquiry (server error '+r.status+').'));
+  $('#dmb').innerHTML=`<div class='pq'><h2 class='it'>Enquiry received</h2><p>Thank you! Your reference is</p><div class='amt'>${H(j.reference)}</div><p class='priv'>I will review your poster and reply by email. Nothing goes live until it is approved.</p><button class='btn' id='dcl'>CLOSE</button></div>`;dm.firstElementChild.classList.remove('wide')}catch(_){fail('Network error. Please try again.')}});
+renderAds();
+sync();
 </script></body></html>
