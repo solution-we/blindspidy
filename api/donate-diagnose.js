@@ -15,12 +15,26 @@ const ist = (s) => {
   return m ? new Date(`${m[3]}-${m[2]}-${m[1]}T${m[4]}:${m[5]}:${m[6]}+05:30`).toISOString() : null;
 };
 
+const FAM_HEADERS = () => ({
+  'X-Api-Key': process.env.FAMGATEWAY_API_KEY,
+  Accept: 'application/json',
+  'User-Agent': 'Mozilla/5.0 (compatible; BlindSpidyServer/1.0)',
+});
+async function famFetch(url, opt = {}) {
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), 8000);
+  try {
+    return await fetch(url, { ...opt, headers: { ...FAM_HEADERS(), ...(opt.headers || {}) }, signal: ctl.signal });
+  } finally {
+    clearTimeout(t);
+  }
+}
+const errDetail = (e) => String((e && e.cause && (e.cause.code || e.cause.message)) || (e && e.name) || 'error') + (e && e.message ? ': ' + e.message : '');
+
 // Authoritative server-to-server check (API key never leaves the server)
 async function famVerify(orderId) {
   try {
-    const r = await fetch(`https://famgateway.in/api/verify-order.php?order_id=${encodeURIComponent(orderId)}`, {
-      headers: { 'X-Api-Key': process.env.FAMGATEWAY_API_KEY },
-    });
+    const r = await famFetch(`https://famgateway.in/api/verify-order.php?order_id=${encodeURIComponent(orderId)}`);
     return await r.json();
   } catch (_) {
     return null;
@@ -84,11 +98,13 @@ module.exports = async (req, res) => {
 
   if (process.env.FAMGATEWAY_API_KEY) {
     try {
-      const r = await fetch('https://famgateway.in/api/verify-order.php?order_id=diag_none', { headers: { 'X-Api-Key': process.env.FAMGATEWAY_API_KEY } });
+      const r = await famFetch('https://famgateway.in/api/verify-order.php?order_id=diag_none');
       out.famgateway.http_status = r.status;
-      out.famgateway.api_key = r.status === 401 ? 'REJECTED' : r.status === 403 ? 'ACCOUNT SUSPENDED' : 'accepted';
-    } catch (_) {
+      out.famgateway.reply_preview = (await r.text()).replace(/\s+/g, ' ').slice(0, 120);
+      out.famgateway.api_key = r.status === 401 ? 'REJECTED' : r.status === 403 ? 'BLOCKED or SUSPENDED (see reply_preview)' : 'accepted';
+    } catch (e) {
       out.famgateway.api_key = 'could not reach famgateway.in';
+      out.famgateway.error = errDetail(e);
     }
   } else {
     out.famgateway.api_key = 'not set';
@@ -98,6 +114,7 @@ module.exports = async (req, res) => {
   if (out.env.SUPABASE_SERVICE_ROLE_KEY === 'MISSING' || out.env.SUPABASE_URL === 'MISSING') out.hints.push('Add the Supabase variables in Vercel, then redeploy.');
   if (Object.values(out.database).some((v) => String(v).startsWith('FAILED'))) out.hints.push('Run donations.sql and ads_and_hardening.sql in the Supabase SQL Editor.');
   if (out.database.published_goal_exists === 'NO') out.hints.push('Publish at least one goal in Admin > Goals.');
+  if (out.famgateway.error) out.hints.push('This server cannot connect to famgateway.in. Send the famgateway.error line to your developer.');
   if (out.famgateway.api_key === 'REJECTED') out.hints.push('FamGateway rejected the API key. Re-copy it from the FamGateway dashboard.');
   if (!out.hints.length) out.hints.push('Setup looks healthy. A real small payment is the remaining test.');
   return res.status(200).json(out);
