@@ -74,7 +74,7 @@ module.exports = async (req, res) => {
     return res.status(400).json({ error: 'Bad request' });
   }
 
-  const cols = 'id,goal_id,payment_status,confirmed_amount,requested_amount,payable_amount,expires_at,qr_url,checkout_url,upi_intent,fundraising_goals(title)';
+  const cols = 'id,donor_id,goal_id,payment_status,confirmed_amount,requested_amount,payable_amount,expires_at,qr_url,checkout_url,upi_intent,fundraising_goals(title)';
   const read = async () => {
     const r = await rest(`donations?select=${cols}&famgateway_order_id=eq.${orderId}&access_token=eq.${token}`);
     return r.ok ? (await r.json())[0] : null;
@@ -97,6 +97,9 @@ module.exports = async (req, res) => {
   };
   if (d.payment_status === 'pending') Object.assign(out, { qr_url: d.qr_url, checkout_url: d.checkout_url, upi_intent: d.upi_intent });
   if (d.payment_status === 'success') {
+    const dr = await rest(`donors?select=show_publicly,name_hidden&id=eq.${d.donor_id}`);
+    const dn = dr.ok ? (await dr.json())[0] : null;
+    out.can_avatar = !!(dn && dn.show_publicly && !dn.name_hidden);
     const r = await rest('rpc/donor_standing', { method: 'POST', body: JSON.stringify({ p_donation: d.id }) });
     const s = r.ok ? (await r.json())[0] : null;
     if (s) { out.lifetime_total = Number(s.lifetime_total); out.rank = s.rank ? Number(s.rank) : null; } // rank is null for anonymous donors
