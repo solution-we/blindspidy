@@ -1,4 +1,5 @@
 {
+  "cleanUrls": true,
   "crons": [
     { "path": "/api/sync-youtube", "schedule": "0 3 * * *" },
     { "path": "/api/donate-reconcile", "schedule": "0 4 * * *" }
