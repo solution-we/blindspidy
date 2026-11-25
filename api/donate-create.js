@@ -4,8 +4,10 @@ const { rest, ist } = require('./_lib/shared');
 
 const clean = (s, max) => String(s || '').replace(/[\u0000-\u001f<>]/g, '').trim().slice(0, max);
 
-module.exports = async (req, res) => {
+async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) return res.status(500).json({ error: 'Server is missing its Supabase settings (SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY).' });
+  if (!process.env.FAMGATEWAY_API_KEY) return res.status(500).json({ error: 'Server is missing FAMGATEWAY_API_KEY.' });
   const b = req.body || {};
   const name = clean(b.name, 80);
   const email = clean(b.email, 200).toLowerCase();
@@ -92,4 +94,13 @@ module.exports = async (req, res) => {
     qr_url: order.qr_url, checkout_url: order.checkout_url, upi_intent: order.upi_intent,
     expires_at: expires, goal_title: goal.title, access_token: token,
   });
+}
+
+module.exports = async (req, res) => {
+  try {
+    return await handler(req, res);
+  } catch (e) {
+    console.error('donate-create failed', e);
+    return res.status(500).json({ error: 'Unexpected server error. Did you run donations.sql in Supabase?' });
+  }
 };
