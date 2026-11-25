@@ -84,11 +84,39 @@ module.exports = async (req, res) => {
       if (!up.ok) throw new Error('Could not save videos');
     }
 
+    // Playlists (kind 'playlist'). Playlists deleted on YouTube disappear on the next sync.
+    try {
+      const plRows = [];
+      let plTok;
+      for (let i = 0; i < 3; i++) {
+        const pl = await yt('playlists', { part: 'snippet,contentDetails', channelId: c.id, maxResults: '50', ...(plTok ? { pageToken: plTok } : {}) });
+        for (const p of pl.items || []) {
+          const th = p.snippet.thumbnails || {};
+          const t = th.maxres || th.high || th.medium || th.default;
+          const n = p.contentDetails.itemCount;
+          plRows.push({
+            platform: 'youtube', kind: 'playlist', external_id: p.id, title: p.snippet.title,
+            thumbnail_url: t ? t.url : null, duration: `${n} video${n === 1 ? '' : 's'}`, view_count: 0,
+            url: `https://www.youtube.com/playlist?list=${p.id}`, published_at: p.snippet.publishedAt, manual: false,
+          });
+        }
+        plTok = pl.nextPageToken;
+        if (!plTok) break;
+      }
+      if (plRows.length) {
+        await fetch(`${SB}/rest/v1/videos?on_conflict=platform,external_id`, {
+          method: 'POST', headers: { ...sbh, Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify(plRows),
+        });
+      }
+      const keep = plRows.map((x) => x.external_id).join(',');
+      await fetch(`${SB}/rest/v1/videos?platform=eq.youtube&kind=eq.playlist&manual=eq.false${keep ? `&external_id=not.in.(${keep})` : ''}`, { method: 'DELETE', headers: sbh });
+    } catch (e) { console.error('playlist sync failed', e.message); }
+
     const stat = { manual: false, status: subs === null ? 'hidden' : 'synced', last_synced_at: new Date().toISOString() };
     if (subs !== null) stat.count = subs;
     await fetch(`${SB}/rest/v1/social_stats?platform=eq.youtube`, { method: 'PATCH', headers: sbh, body: JSON.stringify(stat) });
 
-    return res.status(200).json({ ok: true, videos: rows.length, subscribers: subs });
+    return res.status(200).json({ ok: true, videos: rows.length, subscribers: subs, playlists: true });
   } catch (err) {
     await fetch(`${SB}/rest/v1/social_stats?platform=eq.youtube`, {
       method: 'PATCH', headers: sbh, body: JSON.stringify({ status: 'error' }),
