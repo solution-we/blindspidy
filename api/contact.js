@@ -32,7 +32,7 @@ module.exports = async (req, res) => {
 
   // Email is best effort: the message is already stored for the admin panel.
   try {
-    await fetch('https://api.resend.com/emails', {
+    const rr = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -43,7 +43,8 @@ module.exports = async (req, res) => {
         html: `<p><b>${esc(n)}</b> (${esc(e)})</p><p style="white-space:pre-wrap">${esc(m)}</p>`,
       }),
     });
-  } catch (_) {}
+    if (!rr.ok) console.error('Resend rejected the email:', rr.status, await rr.text());
+  } catch (e) { console.error('Resend request failed:', e.message); }
 
   return res.status(200).json({ ok: true });
 };
