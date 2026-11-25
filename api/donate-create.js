@@ -15,12 +15,26 @@ const ist = (s) => {
   return m ? new Date(`${m[3]}-${m[2]}-${m[1]}T${m[4]}:${m[5]}:${m[6]}+05:30`).toISOString() : null;
 };
 
+const FAM_HEADERS = () => ({
+  'X-Api-Key': process.env.FAMGATEWAY_API_KEY,
+  Accept: 'application/json',
+  'User-Agent': 'Mozilla/5.0 (compatible; BlindSpidyServer/1.0)',
+});
+async function famFetch(url, opt = {}) {
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), 8000);
+  try {
+    return await fetch(url, { ...opt, headers: { ...FAM_HEADERS(), ...(opt.headers || {}) }, signal: ctl.signal });
+  } finally {
+    clearTimeout(t);
+  }
+}
+const errDetail = (e) => String((e && e.cause && (e.cause.code || e.cause.message)) || (e && e.name) || 'error') + (e && e.message ? ': ' + e.message : '');
+
 // Authoritative server-to-server check (API key never leaves the server)
 async function famVerify(orderId) {
   try {
-    const r = await fetch(`https://famgateway.in/api/verify-order.php?order_id=${encodeURIComponent(orderId)}`, {
-      headers: { 'X-Api-Key': process.env.FAMGATEWAY_API_KEY },
-    });
+    const r = await famFetch(`https://famgateway.in/api/verify-order.php?order_id=${encodeURIComponent(orderId)}`);
     return await r.json();
   } catch (_) {
     return null;
@@ -113,20 +127,24 @@ async function handler(req, res) {
   const site = process.env.SITE_URL || `https://${req.headers.host}`;
   let order;
   try {
-    const fr = await fetch('https://famgateway.in/api/create-order', {
+    const fr = await famFetch('https://famgateway.in/api/create-order', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Api-Key': process.env.FAMGATEWAY_API_KEY },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         amount, customer_name: name, customer_email: email,
         redirect_url: `${site}/#home`, webhook_url: `${site}/api/famgateway-webhook`,
       }),
     });
-    const fj = await fr.json();
-    if (!fr.ok || fj.status !== 'success') throw new Error('gateway');
+    const text = await fr.text();
+    let fj;
+    try { fj = JSON.parse(text); } catch (_) { throw new Error('HTTP ' + fr.status + ' non-JSON reply: ' + text.replace(/\s+/g, ' ').slice(0, 80)); }
+    if (!fr.ok || fj.status !== 'success') throw new Error('HTTP ' + fr.status + ': ' + (fj.message || fj.status || 'rejected'));
     order = fj.data;
-  } catch (_) {
+  } catch (e) {
+    const detail = String(e.message).startsWith('HTTP') ? e.message : errDetail(e);
+    console.error('FamGateway create-order failed:', detail);
     await rest(`donations?id=eq.${donation.id}`, { method: 'PATCH', body: JSON.stringify({ payment_status: 'failed' }) });
-    return res.status(502).json({ error: 'Payment service is unavailable. Please try again shortly.' });
+    return res.status(502).json({ error: `Payment service is unavailable (${detail}). Please try again shortly.` });
   }
 
   const expires = ist(order.expires_at_ist);
