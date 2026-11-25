@@ -14,12 +14,26 @@ const ist = (s) => {
   return m ? new Date(`${m[3]}-${m[2]}-${m[1]}T${m[4]}:${m[5]}:${m[6]}+05:30`).toISOString() : null;
 };
 
+const FAM_HEADERS = () => ({
+  'X-Api-Key': process.env.FAMGATEWAY_API_KEY,
+  Accept: 'application/json',
+  'User-Agent': 'Mozilla/5.0 (compatible; BlindSpidyServer/1.0)',
+});
+async function famFetch(url, opt = {}) {
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), 8000);
+  try {
+    return await fetch(url, { ...opt, headers: { ...FAM_HEADERS(), ...(opt.headers || {}) }, signal: ctl.signal });
+  } finally {
+    clearTimeout(t);
+  }
+}
+const errDetail = (e) => String((e && e.cause && (e.cause.code || e.cause.message)) || (e && e.name) || 'error') + (e && e.message ? ': ' + e.message : '');
+
 // Authoritative server-to-server check (API key never leaves the server)
 async function famVerify(orderId) {
   try {
-    const r = await fetch(`https://famgateway.in/api/verify-order.php?order_id=${encodeURIComponent(orderId)}`, {
-      headers: { 'X-Api-Key': process.env.FAMGATEWAY_API_KEY },
-    });
+    const r = await famFetch(`https://famgateway.in/api/verify-order.php?order_id=${encodeURIComponent(orderId)}`);
     return await r.json();
   } catch (_) {
     return null;
