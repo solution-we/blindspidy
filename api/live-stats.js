@@ -45,6 +45,30 @@ async function handler(req, res) {
     } catch (_) {}
   }
 
+
+  // Instagram: follower count every 2 minutes, full reel sync every 30 minutes (only when a token is stored)
+  try {
+    const tr = await rest('integration_tokens?select=token&provider=eq.instagram');
+    const tok = tr.ok ? ((await tr.json())[0] || {}).token : process.env.INSTAGRAM_ACCESS_TOKEN;
+    const ig = rows.find((x) => x.platform === 'instagram');
+    if (tok && !(ig && ig.manual && ig.status === 'manual')) {
+      if (now - Number((await getSet('ig_subs_checked')) || 0) > 120000) {
+        await setSet('ig_subs_checked', now);
+        const r = await fetch(`https://graph.instagram.com/me?fields=followers_count&access_token=${encodeURIComponent(tok)}`);
+        const j = r.ok ? await r.json() : null;
+        if (j && Number.isFinite(j.followers_count)) {
+          await rest('social_stats?platform=eq.instagram', { method: 'PATCH', body: JSON.stringify({ count: j.followers_count, manual: false, status: 'synced', last_synced_at: new Date().toISOString() }) });
+        }
+      }
+      if (process.env.CRON_SECRET && now - Number((await getSet('ig_full_sync')) || 0) > 1800000) {
+        await setSet('ig_full_sync', now);
+        const site = process.env.SITE_URL || `https://${req.headers.host}`;
+        const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 8000);
+        await fetch(`${site}/api/sync-instagram`, { headers: { Authorization: `Bearer ${process.env.CRON_SECRET}` }, signal: ctl.signal }).catch(() => {});
+        clearTimeout(t);
+      }
+    }
+  } catch (_) {}
   rows = await stats();
   const pick = (p) => { const x = rows.find((r) => r.platform === p); return x ? Number(x.count) : null; };
   res.setHeader('Cache-Control', 's-maxage=30, stale-while-revalidate=60');
